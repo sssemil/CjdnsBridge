@@ -21,9 +21,12 @@ import sssemil.com.bridge.util.toHexString
 import java.io.IOException
 
 fun main(args: Array<String>) {
+    val path = "/home/emil/WorkingFolder/socket"
+    val name = "sock"
+
     var cjdnsSocket: CjdnsSocket? = null
     try {
-        cjdnsSocket = CjdnsSocket("/home/emil/WorkingFolder/socket")
+        cjdnsSocket = CjdnsSocket("$path/cjdns_pipe_$name")
         val buffer = ByteArray(2048)
         var readCount: Int
 
