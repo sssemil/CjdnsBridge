@@ -14,19 +14,43 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include <unistd.h>
+#define _GNU_SOURCE /* To get SCM_CREDENTIALS definition from <sys/sockets.h> */
+
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <jni.h>
+#include <unistd.h>
+#include <errno.h>
 #include "JniUtlis.h"
+
+
+/* The Linux-specific, read-only SO_PEERCRED socket option returns
+   credential information about the peer, as described in socket(7) */
+
+JNIEXPORT jobject JNICALL
+Java_sssemil_com_bridge_jni_UnixSocketUtils_idPeer(JNIEnv *env,  jobject obj, jobject jfd) {
+    struct ucred ucred;
+    int sc;
+    socklen_t len;
+    int fd;
+
+    fd = jFileDescriptorToInt(env, jfd);
+    len = sizeof(struct ucred);
+    sc = getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &ucred, &len);
+    if (sc < 0) {
+        char buf[1024];
+        sprintf(buf, "getsockopt: %s\n", strerror(errno));
+
+        throwIoException(env, buf);
+    }
+    
+    return ucredToJUCred(env, ucred);
+}
 
 JNIEXPORT jobject JNICALL
 Java_sssemil_com_bridge_jni_UnixSocketUtils_allocate(JNIEnv *env, jobject obj, jstring sock_name) {
     struct sockaddr_un addr;
-    char buf[1600];
-    int fd, cl;
-    ssize_t rc;
+    int fd;
 
     const char *socket_path = (*env)->GetStringUTFChars(env, sock_name, NULL);
 
@@ -52,29 +76,10 @@ Java_sssemil_com_bridge_jni_UnixSocketUtils_allocate(JNIEnv *env, jobject obj, j
         throwIoException(env, "Listen error!");
     }
 
-    /*while (1) {
-        if ((cl = accept(fd, NULL, NULL)) == -1) {
-            perror("accept error");
-            continue;
-        }
-
-        while ((rc = read(cl, buf, sizeof(buf))) > 0) {
-            printf("read %u bytes: %.*s\n", rc, rc, buf);
-        }
-        if (rc == -1) {
-            perror("read");
-            exit(-1);
-        } else if (rc == 0) {
-            printf("EOF\n");
-            close(cl);
-        }
-    }*/
-
     (*env)->ReleaseStringUTFChars(env, sock_name, socket_path);
 
     return intToJFileDescriptor(env, fd);
 }
-
 
 JNIEXPORT jobject JNICALL
 Java_sssemil_com_bridge_jni_UnixSocketUtils_accept(JNIEnv *env, jobject obj, jobject jfd) {
@@ -98,7 +103,7 @@ Java_sssemil_com_bridge_jni_UnixSocketUtils_subscribe(JNIEnv *env, jobject obj, 
     jclass callbackObjectClass = (*env)->GetObjectClass(env, callback);
 
     jmethodID acceptedMethodId = (*env)->GetMethodID(env, callbackObjectClass, "accepted",
-            "(Ljava/io/FileDescriptor;)V");
+                                                     "(Ljava/io/FileDescriptor;)V");
     jmethodID keepRunningMethodId = (*env)->GetMethodID(env, callbackObjectClass, "keepRunning", "()Z");
 
     if (acceptedMethodId == 0) {

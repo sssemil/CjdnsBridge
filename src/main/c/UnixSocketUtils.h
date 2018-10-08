@@ -20,6 +20,9 @@
 #include <jni.h>
 
 JNIEXPORT jobject JNICALL
+Java_sssemil_com_bridge_jni_UnixSocketUtils_idPeer(JNIEnv *env,  jobject obj, jobject jfd);
+
+JNIEXPORT jobject JNICALL
 Java_sssemil_com_bridge_jni_UnixSocketUtils_allocate(JNIEnv *env, jobject obj, jstring sock_name);
 
 JNIEXPORT jobject JNICALL

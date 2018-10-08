@@ -14,24 +14,6 @@
  * limitations under the License.
  */
 
-#ifndef JNIUNIXUTILS_JNIUTILS_H
-#define JNIUNIXUTILS_JNIUTILS_H
+package sssemil.com.bridge.jni
 
-#define _GNU_SOURCE /* To get SCM_CREDENTIALS definition from <sys/sockets.h> */
-
-#include <sys/socket.h>
-#include <jni.h>
-
-int throwException(JNIEnv *env, const char *className, const char *msg);
-
-int throwIoException(JNIEnv *env, const char *msg);
-
-jobject ucredToJUCred(JNIEnv *env, struct ucred ucred);
-
-jclass getFileDescriptorClass(JNIEnv *env);
-
-jobject intToJFileDescriptor(JNIEnv *env, int fd);
-
-int jFileDescriptorToInt(JNIEnv *env, jobject jfd);
-
-#endif //JNIUNIXUTILS_JNIUTILS_H
+data class UCred(val pid: Long, val uid: Long, val gid: Long)

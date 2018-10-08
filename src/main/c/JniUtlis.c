@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+#define _GNU_SOURCE /* To get SCM_CREDENTIALS definition from <sys/sockets.h> */
+
+#include <sys/socket.h>
 #include <jni.h>
 #include <string.h>
 #include <errno.h>
@@ -31,6 +34,34 @@ int throwException(JNIEnv *env, const char *className, const char *msg) {
 
 int throwIoException(JNIEnv *env, const char *msg) {
     return throwException(env, "java/io/IOException", msg);
+}
+
+jclass getUCredClass(JNIEnv *env) {
+    jclass fdClass;
+
+    fdClass = (*env)->FindClass(env, "sssemil/com/bridge/jni/UCred");
+    if (fdClass == NULL) {
+        throwIoException(env, "Couldn't get sssemil.com.bridge.jni.UCred class!");
+    }
+
+    return fdClass;
+}
+
+jobject ucredToJUCred(JNIEnv *env, struct ucred ucred) {
+    jfieldID fieldFd;
+    jmethodID methodId;
+    jclass fdClass;
+    jobject ret;
+
+    fdClass = getUCredClass(env);
+
+    // construct a new UCred
+    methodId = (*env)->GetMethodID(env, fdClass, "<init>", "(JJJ)V");
+    if (methodId == NULL) return NULL;
+    ret = (*env)->NewObject(env, fdClass, methodId, (long) ucred.pid, (long) ucred.uid, (long) ucred.gid);
+
+    // and return it
+    return ret;
 }
 
 jclass getFileDescriptorClass(JNIEnv *env) {

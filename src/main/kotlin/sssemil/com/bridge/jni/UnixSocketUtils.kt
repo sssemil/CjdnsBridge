@@ -22,6 +22,11 @@ import java.io.FileDescriptor
 internal class UnixSocketUtils {
 
     /**
+     * Get pid, uid, and gid of the client.
+     */
+    external fun idPeer(fd: FileDescriptor): UCred
+
+    /**
      * Allocate a unix domain socket.
      *
      * @param path Path for your new socket.

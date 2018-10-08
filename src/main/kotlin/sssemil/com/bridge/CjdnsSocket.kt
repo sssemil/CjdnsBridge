@@ -59,8 +59,9 @@ class CjdnsSocket(path: String) {
                         closeClient()
 
                         synchronized(clientLock) {
-
                             clientFd = fd
+
+                            Logger.d("${unixSocketUtils.idPeer(fd)}")
 
                             clientInputStream = FileInputStream(clientFd)
                             clientOutputStream = FileOutputStream(clientFd)
