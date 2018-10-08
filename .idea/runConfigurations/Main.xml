@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Main" type="JetRunConfigurationType" factoryName="Kotlin" singleton="true">
-    <module name="TunBridger_main" />
+    <module name="CjdnsBridge_main" />
     <option name="VM_PARAMETERS" value="-Djava.library.path=./build/libs/main/shared" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
