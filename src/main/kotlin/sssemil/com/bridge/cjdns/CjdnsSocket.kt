@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge
+package sssemil.com.bridge.cjdns
 
 import sssemil.com.bridge.jni.UnixSocketUtils
 import sssemil.com.bridge.jni.interfaces.OnAcceptListener
@@ -51,9 +51,10 @@ class CjdnsSocket(path: String) {
             val socketFd = unixSocketUtils.allocate(path)
             this.socketFd = socketFd
 
+            Logger.d("Waiting for client fd...")
             unixSocketUtils.onAccept(socketFd, object : OnAcceptListener {
                 override fun accepted(fd: FileDescriptor) {
-                    Logger.d("Accepted fd: $fd, valid: ${fd.valid()}")
+                    Logger.d("Accepted client fd, valid: ${fd.valid()}")
 
                     if (fd.valid()) {
                         closeClient()
@@ -61,7 +62,7 @@ class CjdnsSocket(path: String) {
                         synchronized(clientLock) {
                             clientFd = fd
 
-                            Logger.d("${unixSocketUtils.idPeer(fd)}")
+                            Logger.d("Client info: ${unixSocketUtils.idPeer(fd)}")
 
                             clientInputStream = FileInputStream(clientFd)
                             clientOutputStream = FileOutputStream(clientFd)
