@@ -16,31 +16,52 @@
 
 package sssemil.com.bridge
 
+import sssemil.com.bridge.cjdns.CjdnsLayer
 import sssemil.com.bridge.util.Logger
 import sssemil.com.bridge.util.toHexString
-import java.io.IOException
+import sssemil.com.net.layers.Layer
+import sssemil.com.net.layers.osi.NetworkLayer
+import java.io.File
 
 fun main(args: Array<String>) {
-    val path = "/home/emil/WorkingFolder/socket"
-    val name = "sock"
+    if (args.size != 2) {
+        printUsageAndExit()
+    } else {
+        val path = args[0]
+        val name = args[1]
+        val fullPath = "$path/cjdns_pipe_$name"
+        val socketFile = File(fullPath)
 
-    var cjdnsSocket: CjdnsSocket? = null
-    try {
-        cjdnsSocket = CjdnsSocket("$path/cjdns_pipe_$name")
-        val buffer = ByteArray(2048)
-        var readCount: Int
-
-        cjdnsSocket.onAcceptListener = {
-            do {
-                readCount = cjdnsSocket.read(buffer)
-
-                Logger.i("read count: $readCount, packet: ${buffer.sliceArray(0 until readCount).toHexString()}")
-            } while (readCount != -1)
-
-            cjdnsSocket.closeClient()
-        }
-    } catch (e: IOException) {
-        Logger.e("IOExc", e)
-        cjdnsSocket?.kill()
+        Logger.i("Socket path: ${socketFile.absolutePath}")
+        exec(File(fullPath))
     }
+}
+
+fun exec(socket: File) {
+    val layers = ArrayList<Layer>()
+    try {
+        layers.add(CjdnsLayer(socket.absolutePath))
+        layers.add(object : NetworkLayer() {
+            override fun kill() {
+            }
+
+            override fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean {
+                Logger.d("read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}")
+                return true
+            }
+        })
+
+        for (i in layers.indices - 1) {
+            layers[i].bindUp(layers[i + 1])
+        }
+    } catch (e: Exception) {
+        Logger.e("Error", e)
+        layers.forEach { it.kill() }
+        System.exit(-1)
+    }
+}
+
+fun printUsageAndExit() {
+    Logger.e("Usage: bridge /path/to/directory/with/socket socket_name")
+    System.exit(-1)
 }
