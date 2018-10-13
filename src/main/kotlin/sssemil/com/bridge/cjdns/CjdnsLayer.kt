@@ -16,10 +16,9 @@
 
 package sssemil.com.bridge.cjdns
 
-import sssemil.com.bridge.util.Logger
-import sssemil.com.net.layers.osi.DataLinkLayer
+import sssemil.com.net.layers.osi.IPhysicalLayer
 
-class CjdnsLayer(path: String) : DataLinkLayer() {
+class CjdnsLayer(path: String) : IPhysicalLayer() {
 
     private val cjdnsSocket = CjdnsSocket(path)
 
@@ -31,9 +30,7 @@ class CjdnsLayer(path: String) : DataLinkLayer() {
             do {
                 readCount = cjdnsSocket.read(buffer)
 
-                upLink?.swallow(buffer, 0, readCount) ?: run {
-                    Logger.w("No upper layer! Data will be lost.")
-                }
+                spit(buffer, 2, readCount)
             } while (readCount != -1)
 
             cjdnsSocket.closeClient()

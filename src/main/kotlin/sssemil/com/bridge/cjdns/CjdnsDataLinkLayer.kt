@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.osi
+package sssemil.com.bridge.cjdns
 
-import sssemil.com.net.layers.Layer
+import sssemil.com.net.layers.osi.IDataLinkLayer
 
-abstract class DataLinkLayer : Layer(NetworkLayer::class.java, Nothing::class.java)
+class CjdnsDataLinkLayer : IDataLinkLayer() {
+    override fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean {
+        // all is ipv6 ethertype
+        spit(buffer, 4, length)
+        return true
+    }
+}

@@ -18,4 +18,4 @@ package sssemil.com.net.layers.osi
 
 import sssemil.com.net.layers.Layer
 
-abstract class PhysicalLayer : Layer(DataLinkLayer::class.java, Nothing::class.java)
+abstract class IPhysicalLayer : Layer(IDataLinkLayer::class.java, Nothing::class.java)

@@ -16,11 +16,13 @@
 
 package sssemil.com.bridge
 
+import sssemil.com.bridge.cjdns.CjdnsDataLinkLayer
 import sssemil.com.bridge.cjdns.CjdnsLayer
 import sssemil.com.bridge.util.Logger
 import sssemil.com.bridge.util.toHexString
 import sssemil.com.net.layers.Layer
-import sssemil.com.net.layers.osi.NetworkLayer
+import sssemil.com.net.layers.network.NetworkLayer
+import sssemil.com.net.layers.osi.ITransportLayer
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -41,7 +43,9 @@ fun exec(socket: File) {
     val layers = ArrayList<Layer>()
     try {
         layers.add(CjdnsLayer(socket.absolutePath))
-        layers.add(object : NetworkLayer() {
+        layers.add(CjdnsDataLinkLayer())
+        layers.add(NetworkLayer())
+        layers.add(object : ITransportLayer() {
             override fun kill() {
             }
 
@@ -51,7 +55,7 @@ fun exec(socket: File) {
             }
         })
 
-        for (i in layers.indices - 1) {
+        for (i in 0 until layers.size - 1) {
             layers[i].bindUp(layers[i + 1])
         }
     } catch (e: Exception) {

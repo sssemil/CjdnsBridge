@@ -18,4 +18,4 @@ package sssemil.com.net.layers.osi
 
 import sssemil.com.net.layers.Layer
 
-abstract class TransportLayer : Layer(SessionLayer::class.java, NetworkLayer::class.java)
+abstract class INetworkLayer : Layer(ITransportLayer::class.java, IDataLinkLayer::class.java)

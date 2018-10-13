@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.osi
+package sssemil.com.net.layers.network.structures
 
-import sssemil.com.net.layers.Layer
-
-abstract class NetworkLayer : Layer(TransportLayer::class.java, DataLinkLayer::class.java)
+abstract class Payload {
+    abstract fun build(): ByteArray
+}

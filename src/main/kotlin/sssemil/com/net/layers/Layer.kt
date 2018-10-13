@@ -17,13 +17,14 @@
 package sssemil.com.net.layers
 
 import sssemil.com.bridge.util.Logger
+import java.util.*
 import kotlin.reflect.jvm.jvmName
 
-abstract class Layer(private val upClass: Class<*>, private val downClass: Class<*>) {
+abstract class Layer(protected open val upClass: Class<*>, protected open val downClass: Class<*>) {
 
-    protected var upLink: Layer? = null
+    private var upLinks: LinkedList<Layer> = LinkedList()
 
-    protected var downLink: Layer? = null
+    private var downLinks: LinkedList<Layer> = LinkedList()
 
     init {
         Logger.d("Test here for up down classes...")
@@ -31,9 +32,20 @@ abstract class Layer(private val upClass: Class<*>, private val downClass: Class
 
     abstract fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean
 
+    /**
+     * Sends to the upper level.
+     */
+    fun spit(buffer: ByteArray, offset: Int, length: Int) {
+        if (upLinks.isEmpty()) {
+            Logger.w("No upper layer set! Data will be lost.")
+        } else {
+            upLinks.forEach { it.swallow(buffer, offset, length) }
+        }
+    }
+
     fun bindUp(layer: Layer, first: Boolean = true) {
         if (upClass.isAssignableFrom(layer::class.java)) {
-            upLink = layer
+            upLinks.add(layer)
             if (first) {
                 layer.bindDown(this, false)
             }
@@ -42,16 +54,17 @@ abstract class Layer(private val upClass: Class<*>, private val downClass: Class
         }
     }
 
-    fun unbindUp(first: Boolean = true) {
+    fun unbindUp(layer: Layer, first: Boolean = true) {
         if (first) {
-            upLink?.unbindDown(false)
+            upLinks.filter { it == layer }
+                    .forEach { it.unbindDown(this, false) }
         }
-        upLink = null
+        upLinks.remove(layer)
     }
 
     fun bindDown(layer: Layer, first: Boolean = true) {
         if (downClass.isAssignableFrom(layer::class.java)) {
-            downLink = layer
+            downLinks.add(layer)
             if (first) {
                 layer.bindUp(this, false)
             }
@@ -60,15 +73,16 @@ abstract class Layer(private val upClass: Class<*>, private val downClass: Class
         }
     }
 
-    fun unbindDown(first: Boolean = true) {
+    fun unbindDown(layer: Layer, first: Boolean = true) {
         if (first) {
-            downLink?.unbindUp(false)
+            downLinks.filter { it == layer }
+                    .forEach { it.unbindUp(this, false) }
         }
-        downLink = null
+        downLinks.remove(layer)
     }
 
     open fun kill() {
-        upLink?.unbindDown(true)
-        downLink?.unbindDown(true)
+        upLinks.forEach { it.unbindDown(this, true) }
+        downLinks.forEach { it.unbindDown(this, true) }
     }
 }
