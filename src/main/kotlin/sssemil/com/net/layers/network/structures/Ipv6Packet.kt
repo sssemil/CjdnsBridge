@@ -24,10 +24,14 @@ import java.io.DataInputStream
 import java.net.Inet6Address
 import java.util.*
 
-data class Ipv6Packet(val version: Octet = IPV6, val trafficClass: Byte = 0,
+data class Ipv6Packet(val version: Octet = IPV6,
+                      val trafficClass: Byte = 0,
                       val flowLabel: Array<Octet> = Array(5) { 0.toOctet() },
-                      var payloadLength: Short = 0, val nextHeader: Byte = UDP, val hopLimit: Byte,
-                      val sourceAddress: Inet6Address, val destinationAddress: Inet6Address,
+                      var payloadLength: Short = 0,
+                      val nextHeader: Byte = UDP,
+                      val hopLimit: Byte,
+                      val sourceAddress: Inet6Address,
+                      val destinationAddress: Inet6Address,
                       val extensionHeaders: Array<Ipv6ExtensionHeader> = Array(0) { Ipv6ExtensionHeader() },
                       val payload: Payload? = null) {
     fun build(): ByteArray {

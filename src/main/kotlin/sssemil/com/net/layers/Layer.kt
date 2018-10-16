@@ -18,9 +18,8 @@ package sssemil.com.net.layers
 
 import sssemil.com.bridge.util.Logger
 import java.util.*
-import kotlin.reflect.jvm.jvmName
 
-abstract class Layer(protected open val upClass: Class<*>, protected open val downClass: Class<*>) {
+abstract class Layer {
 
     private var upLinks: LinkedList<Layer> = LinkedList()
 
@@ -44,13 +43,9 @@ abstract class Layer(protected open val upClass: Class<*>, protected open val do
     }
 
     fun bindUp(layer: Layer, first: Boolean = true) {
-        if (upClass.isAssignableFrom(layer::class.java)) {
-            upLinks.add(layer)
-            if (first) {
-                layer.bindDown(this, false)
-            }
-        } else {
-            throw RuntimeException("${upClass.name} required, but got ${layer::class.jvmName}!")
+        upLinks.add(layer)
+        if (first) {
+            layer.bindDown(this, false)
         }
     }
 
@@ -63,13 +58,9 @@ abstract class Layer(protected open val upClass: Class<*>, protected open val do
     }
 
     fun bindDown(layer: Layer, first: Boolean = true) {
-        if (downClass.isAssignableFrom(layer::class.java)) {
-            downLinks.add(layer)
-            if (first) {
-                layer.bindUp(this, false)
-            }
-        } else {
-            throw RuntimeException("${downClass.name} required, but got ${layer::class.jvmName}!")
+        downLinks.add(layer)
+        if (first) {
+            layer.bindUp(this, false)
         }
     }
 

@@ -17,11 +17,11 @@
 package sssemil.com.net.layers.network
 
 import sssemil.com.bridge.util.Logger
+import sssemil.com.net.layers.Layer
 import sssemil.com.net.layers.network.exceptions.InvalidTypeException
 import sssemil.com.net.layers.network.structures.Ipv6Packet
-import sssemil.com.net.layers.osi.INetworkLayer
 
-class NetworkLayer : INetworkLayer() {
+class NetworkLayer : Layer() {
 
     override fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean {
         handle(buffer.sliceArray(offset until length))
