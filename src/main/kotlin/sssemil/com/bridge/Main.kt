@@ -16,23 +16,26 @@
 
 package sssemil.com.bridge
 
-import sssemil.com.bridge.cjdns.CjdnsDataLinkLayer
 import sssemil.com.bridge.cjdns.CjdnsLayer
 import sssemil.com.bridge.util.Logger
 import sssemil.com.bridge.util.toHexString
 import sssemil.com.net.layers.Layer
+import sssemil.com.net.layers.network.IdentityLayer
 import sssemil.com.net.layers.network.NetworkLayer
-import sssemil.com.net.layers.osi.ITransportLayer
 import java.io.File
+import java.lang.System.exit
 
 fun main(args: Array<String>) {
-    if (args.size != 2) {
+    if (args.size != 1) {
         printUsageAndExit()
     } else {
-        val path = args[0]
-        val name = args[1]
-        val fullPath = "$path/cjdns_pipe_$name"
+        val fullPath = args[0]
         val socketFile = File(fullPath)
+
+        if (socketFile.exists()) {
+            Logger.e("Specified path is already taken!")
+            exit(-1)
+        }
 
         Logger.i("Socket path: ${socketFile.absolutePath}")
         exec(File(fullPath))
@@ -42,18 +45,13 @@ fun main(args: Array<String>) {
 fun exec(socket: File) {
     val layers = ArrayList<Layer>()
     try {
-        layers.add(CjdnsLayer(socket.absolutePath))
-        layers.add(CjdnsDataLinkLayer())
-        layers.add(NetworkLayer())
-        layers.add(object : ITransportLayer() {
-            override fun kill() {
-            }
-
-            override fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean {
-                Logger.d("read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}")
-                return true
-            }
-        })
+        layers.addAll(listOf(
+                CjdnsLayer(socket.absolutePath, true),
+                IdentityLayer { buffer, offset, length ->
+                    Logger.d("read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}")
+                },
+                NetworkLayer()
+        ))
 
         for (i in 0 until layers.size - 1) {
             layers[i].bindUp(layers[i + 1])
@@ -61,11 +59,11 @@ fun exec(socket: File) {
     } catch (e: Exception) {
         Logger.e("Error", e)
         layers.forEach { it.kill() }
-        System.exit(-1)
+        exit(-1)
     }
 }
 
 fun printUsageAndExit() {
-    Logger.e("Usage: bridge /path/to/directory/with/socket socket_name")
-    System.exit(-1)
+    Logger.e("Usage: bridge /path/to/directory/with/socket/essnet")
+    exit(-1)
 }
