@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef JNIUNIXUTILS_TUNUTILS_H
-#define JNIUNIXUTILS_TUNUTILS_H
+package sssemil.com.socket.interfaces
 
-#include <jni.h>
+import java.net.Socket
 
-int allocateTunDevice(char *dev, int flags);
+interface OnAcceptSocketListener {
 
-JNIEXPORT jobject JNICALL
-Java_sssemil_com_bridge_jni_TunUtils_allocate(JNIEnv *env, jobject obj, jstring ifName);
+    /**
+     * Here you will get incoming socket.
+     */
+    fun accepted(socket: Socket)
 
-#endif //JNIUNIXUTILS_TUNUTILS_H
+    /**
+     * Tell if should keep listening.
+     */
+    fun keepRunning(): Boolean
+}

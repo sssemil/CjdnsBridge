@@ -16,12 +16,11 @@
 
 package sssemil.com.bridge.cjdns
 
-import sssemil.com.bridge.jni.UnixSocketUtils
-import sssemil.com.bridge.jni.interfaces.OnAcceptListener
+import sssemil.com.socket.interfaces.OnAcceptSocketListener
+import sssemil.com.socket.SocketHelper
+import sssemil.com.socket.onAccept
 import sssemil.com.bridge.util.Logger
-import java.io.FileDescriptor
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -29,14 +28,9 @@ class CjdnsSocket(path: String) {
 
     private val keepRunning = AtomicBoolean(true)
 
-    private var socketFd: FileDescriptor? = null
+    private val socketLock = Object()
 
-    private val clientLock = Object()
-
-    private var clientFd: FileDescriptor? = null
-
-    private var clientInputStream: FileInputStream? = null
-    private var clientOutputStream: FileOutputStream? = null
+    private var socket: Socket? = null
 
     /**
      * Get notified on new client.
@@ -45,31 +39,17 @@ class CjdnsSocket(path: String) {
 
     private var socketThread: Thread
 
+
     init {
         socketThread = thread {
-            val unixSocketUtils = UnixSocketUtils()
-            val socketFd = unixSocketUtils.allocate(path)
-            this.socketFd = socketFd
-
-            Logger.d("Waiting for client fd...")
-            unixSocketUtils.onAccept(socketFd, object : OnAcceptListener {
-                override fun accepted(fd: FileDescriptor) {
-                    Logger.d("Accepted client fd, valid: ${fd.valid()}")
-
-                    if (fd.valid()) {
-                        closeClient()
-
-                        synchronized(clientLock) {
-                            clientFd = fd
-
-                            Logger.d("Client info: ${unixSocketUtils.idPeer(fd)}")
-
-                            clientInputStream = FileInputStream(clientFd)
-                            clientOutputStream = FileOutputStream(clientFd)
-                        }
-
-                        onAcceptListener?.invoke()
+            SocketHelper.createServerSocket(path)?.onAccept(object : OnAcceptSocketListener {
+                override fun accepted(socket: Socket) {
+                    Logger.d("Accepted client socket: $socket")
+                    synchronized(socketLock) {
+                        this@CjdnsSocket.socket?.close()
+                        this@CjdnsSocket.socket = socket
                     }
+                    onAcceptListener?.invoke()
                 }
 
                 override fun keepRunning() = keepRunning.get()
@@ -87,15 +67,11 @@ class CjdnsSocket(path: String) {
     }
 
     /**
-     * Close all streams with current client.
+     * Close current socket.
      */
     fun closeClient() {
-        synchronized(clientLock) {
-            clientInputStream?.close()
-            clientOutputStream?.close()
-
-            clientInputStream = null
-            clientOutputStream = null
+        synchronized(socketLock) {
+            socket?.close()
         }
     }
 
@@ -103,21 +79,17 @@ class CjdnsSocket(path: String) {
      * Write to the socket.
      *
      * @param buffer A buffer containing the packet.
-     * @param size the first size bytes will be sent.
+     * @param length the first size bytes will be sent.
      *
      * @return Whether or not there was a client to write to.
      */
     fun write(buffer: ByteArray, offset: Int, length: Int): Boolean {
-        synchronized(clientLock) {
-            val clientFd = clientFd
-            val clientOutputStream = clientOutputStream
-
-            if (clientFd == null || !clientFd.valid() || clientOutputStream == null) {
+        synchronized(socketLock) {
+            socket?.getOutputStream()?.write(buffer, offset, length) ?: run {
                 Logger.w("There is no valid client yet!")
                 return false
             }
 
-            clientOutputStream.write(buffer, offset, length)
             return true
         }
     }
@@ -130,16 +102,13 @@ class CjdnsSocket(path: String) {
      * @return The number of bytes read.
      */
     fun read(buffer: ByteArray): Int {
-        synchronized(clientLock) {
-            val clientFd = clientFd
-            val clientInputStream = clientInputStream
-
-            if (clientFd == null || !clientFd.valid() || clientInputStream == null) {
+        synchronized(socketLock) {
+            socket?.getInputStream()?.let {
+                return it.read(buffer)
+            } ?: run {
                 Logger.w("There is no valid client yet!")
                 return -1
             }
-
-            return clientInputStream.read(buffer)
         }
     }
 

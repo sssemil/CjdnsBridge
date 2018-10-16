@@ -14,19 +14,25 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.jni.interfaces
+package sssemil.com.platform.utils
 
-import java.io.FileDescriptor
+object OsUtils {
 
-interface OnAcceptListener {
+    public var OS: String? = null
+        get() {
+            if (field == null) {
+                field = System.getProperty("os.name")
+            }
 
-    /**
-     * Here you will get incoming file descriptors.
-     */
-    fun accepted(fd: FileDescriptor)
+            return field
+        }
+        private set
 
-    /**
-     * Tell if should keep listening.
-     */
-    fun keepRunning(): Boolean
+    fun isWin32(): Boolean {
+        return false
+    }
+
+    fun isUnix(): Boolean {
+        return true
+    }
 }

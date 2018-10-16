@@ -16,9 +16,25 @@
 
 package sssemil.com.bridge.cjdns
 
-import sssemil.com.net.layers.osi.IPhysicalLayer
+import sssemil.com.net.layers.Layer
 
-class CjdnsLayer(path: String) : IPhysicalLayer() {
+/**
+ * This layer spits IPv6 packets from cjdns.
+ *
+ * -------------------------------------------------------
+ * | Flags (2 bytes) | Proto (2 bytes) | Raw IPv6 packet |
+ * -------------------------------------------------------
+ *
+ * If you don't need packet information, set noPi to true. They you'll get:
+ *
+ * -------------------
+ * | Raw IPv6 packet |
+ * -------------------
+ *
+ * @param path Path to cjdns socket.
+ * @param noPi Set to true, to only get raw IP packet.
+ */
+class CjdnsLayer(path: String, noPi: Boolean) : Layer() {
 
     private val cjdnsSocket = CjdnsSocket(path)
 
@@ -30,7 +46,7 @@ class CjdnsLayer(path: String) : IPhysicalLayer() {
             do {
                 readCount = cjdnsSocket.read(buffer)
 
-                spit(buffer, 2, readCount)
+                spit(buffer, if (noPi) NO_PI_OFFSET else 0, readCount)
             } while (readCount != -1)
 
             cjdnsSocket.closeClient()
@@ -46,5 +62,6 @@ class CjdnsLayer(path: String) : IPhysicalLayer() {
 
     companion object {
         const val BUFFER_SIZE = 2048
+        const val NO_PI_OFFSET = 4
     }
 }
