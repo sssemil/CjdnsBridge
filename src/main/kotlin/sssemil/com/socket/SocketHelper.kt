@@ -16,25 +16,25 @@
 
 package sssemil.com.socket
 
+import com.sun.jna.Platform
 import sssemil.com.socket.interfaces.OnAcceptSocketListener
 import sssemil.com.socket.unix.UnixDomainServerSocket
 import sssemil.com.socket.unix.UnixDomainSocket
 import sssemil.com.socket.win32.Win32NamedPipeServerSocket
 import sssemil.com.socket.win32.Win32NamedPipeSocket
-import sssemil.com.platform.utils.OsUtils
 import java.net.ServerSocket
 
 object SocketHelper {
 
     fun createServerSocket(path: String) = when {
-        OsUtils.isWin32() -> Win32NamedPipeServerSocket(path)
-        OsUtils.isUnix() -> UnixDomainServerSocket(path)
+        Platform.isWindows() -> Win32NamedPipeServerSocket(path)
+        Platform.isLinux() -> UnixDomainServerSocket(path)
         else -> null
     }
 
     fun createSocket(path: String) = when {
-        OsUtils.isWin32() -> Win32NamedPipeSocket(path)
-        OsUtils.isUnix() -> UnixDomainSocket(path)
+        Platform.isWindows() -> Win32NamedPipeSocket(path)
+        Platform.isLinux() -> UnixDomainSocket(path)
         else -> null
     }
 }
