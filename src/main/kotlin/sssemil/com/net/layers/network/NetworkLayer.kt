@@ -18,6 +18,7 @@ package sssemil.com.net.layers.network
 
 import sssemil.com.bridge.util.Logger
 import sssemil.com.net.layers.Layer
+import sssemil.com.net.layers.network.exceptions.EmptyPacketException
 import sssemil.com.net.layers.network.exceptions.InvalidTypeException
 import sssemil.com.net.layers.network.structures.Ipv6Packet
 
@@ -37,6 +38,8 @@ class NetworkLayer : Layer() {
             spit(packet, 0, packet.size)
         } catch (e: InvalidTypeException) {
             Logger.e("Can't parse packet!\n", e)
+        } catch (e: EmptyPacketException) {
+            Logger.e("Can't parse empty packet!\n", e)
         }
     }
 }

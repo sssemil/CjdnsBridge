@@ -17,6 +17,7 @@
 package sssemil.com.net.layers.network.structures
 
 import sssemil.com.bridge.util.toBytes
+import sssemil.com.net.layers.network.exceptions.EmptyPacketException
 import sssemil.com.net.layers.network.exceptions.InvalidTypeException
 import sssemil.com.net.util.number.Octet
 import sssemil.com.net.util.number.toOctet
@@ -66,6 +67,10 @@ data class Ipv6Packet(val version: Octet = IPV6,
 
     companion object {
         fun parse(arr: ByteArray): Ipv6Packet = with(DataInputStream(arr.inputStream())) {
+            if (arr.isEmpty()) {
+                throw EmptyPacketException("Can't process an empty packet!")
+            }
+
             val version = read().shr(4).toOctet()
 
             if (version != IPV6) {

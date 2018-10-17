@@ -16,4 +16,4 @@
 
 package sssemil.com.net.layers.network.exceptions
 
-class InvalidTypeException(message: String) : RuntimeException(message)
+class EmptyPacketException(message: String) : RuntimeException(message)
