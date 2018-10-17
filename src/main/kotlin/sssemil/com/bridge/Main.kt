@@ -33,8 +33,8 @@ fun main(args: Array<String>) {
         val socketFile = File(fullPath)
 
         if (socketFile.exists()) {
-            Logger.e("Specified path is already taken!")
-            exit(-1)
+            Logger.w("Specified path is already taken!")
+            socketFile.delete()
         }
 
         Logger.i("Socket path: ${socketFile.absolutePath}")
