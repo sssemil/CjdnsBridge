@@ -37,9 +37,9 @@ class NetworkLayer : Layer() {
 
             spit(packet, 0, packet.size)
         } catch (e: InvalidTypeException) {
-            Logger.e("Can't parse packet!\n", e)
+            Logger.w("Can't parse packet type!\n")
         } catch (e: EmptyPacketException) {
-            Logger.e("Can't parse empty packet!\n", e)
+            Logger.w("Can't parse empty packet!\n")
         }
     }
 }
