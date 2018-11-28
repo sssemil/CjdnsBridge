@@ -17,7 +17,7 @@
 package sssemil.com.net.layers
 
 import sssemil.com.bridge.util.Logger
-import java.util.*
+import java.util.LinkedList
 
 abstract class Layer {
 
@@ -29,16 +29,35 @@ abstract class Layer {
         Logger.d("Test here for up down classes...")
     }
 
-    abstract fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean
+    /**
+     * Takes from the lower level.
+     */
+    abstract fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int): Boolean
 
     /**
      * Sends to the upper level.
      */
-    fun spit(buffer: ByteArray, offset: Int, length: Int) {
+    fun spitUp(buffer: ByteArray, offset: Int, length: Int) {
         if (upLinks.isEmpty()) {
             Logger.w("No upper layer set! Data will be lost.")
         } else {
-            upLinks.forEach { it.swallow(buffer, offset, length) }
+            upLinks.forEach { it.swallowFromBelow(buffer, offset, length) }
+        }
+    }
+
+    /**
+     * Takes from the upper level.
+     */
+    abstract fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int): Boolean
+
+    /**
+     * Sends to the lower level.
+     */
+    fun spitDown(buffer: ByteArray, offset: Int, length: Int) {
+        if (downLinks.isEmpty()) {
+            Logger.w("No lower layer set! Data will be lost.")
+        } else {
+            downLinks.forEach { it.swallowFromAbove(buffer, offset, length) }
         }
     }
 

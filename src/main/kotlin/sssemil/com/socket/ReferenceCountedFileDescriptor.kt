@@ -17,9 +17,8 @@
 package sssemil.com.socket
 
 import com.sun.jna.LastErrorException
-
-import java.io.IOException
 import sssemil.com.socket.unix.UnixDomainSocketLibrary
+import java.io.IOException
 
 /**
  * Encapsulates a file descriptor plus a reference count to ensure close requests
@@ -29,7 +28,7 @@ import sssemil.com.socket.unix.UnixDomainSocketLibrary
  * If not explicitly closed, the file descriptor will be closed when
  * this object is finalized.
  */
-class ReferenceCountedFileDescriptor(private var fd: Int) {
+open class ReferenceCountedFileDescriptor(private var fd: Int) {
     private var fdRefCount: Int = 0
     private var closePending: Boolean = false
 
@@ -81,6 +80,5 @@ class ReferenceCountedFileDescriptor(private var fd: Int) {
         } catch (e: LastErrorException) {
             throw IOException(e)
         }
-
     }
 }

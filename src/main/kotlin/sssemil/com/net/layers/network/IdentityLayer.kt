@@ -19,9 +19,16 @@ package sssemil.com.net.layers.network
 import sssemil.com.net.layers.Layer
 
 class IdentityLayer(private val function: (buffer: ByteArray, offset: Int, length: Int) -> Unit) : Layer() {
-    override fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean {
+
+    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int): Boolean {
         function.invoke(buffer, offset, length)
-        spit(buffer, offset, length)
+        spitDown(buffer, offset, length)
+        return true
+    }
+
+    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int): Boolean {
+        function.invoke(buffer, offset, length)
+        spitUp(buffer, offset, length)
         return true
     }
 }

@@ -24,7 +24,9 @@ import sssemil.com.net.layers.network.structures.Ipv6Packet
 
 class NetworkLayer : Layer() {
 
-    override fun swallow(buffer: ByteArray, offset: Int, length: Int): Boolean {
+    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) = false
+
+    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int): Boolean {
         handle(buffer.sliceArray(offset until length))
         return true
     }
@@ -35,7 +37,22 @@ class NetworkLayer : Layer() {
 
             Logger.i(ipv6Packet.toString())
 
-            spit(packet, 0, packet.size)
+            val returnPacket = Ipv6Packet(
+                    ipv6Packet.version,
+                    ipv6Packet.trafficClass,
+                    ipv6Packet.flowLabel,
+                    ipv6Packet.payloadLength,
+                    ipv6Packet.nextHeader,
+                    ipv6Packet.hopLimit,
+                    ipv6Packet.destinationAddress,
+                    ipv6Packet.sourceAddress,
+                    ipv6Packet.extensionHeaders,
+                    ipv6Packet.payload
+            )
+
+            returnPacket.build().let {
+                spitDown(it, 0, it.size)
+            }
         } catch (e: InvalidTypeException) {
             Logger.w("Can't parse packet type!\n")
         } catch (e: EmptyPacketException) {
