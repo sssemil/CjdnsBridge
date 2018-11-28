@@ -17,13 +17,13 @@
 package sssemil.com.socket.unix
 
 import com.sun.jna.LastErrorException
+import sssemil.com.socket.ReferenceCountedFileDescriptor
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
-import sssemil.com.socket.ReferenceCountedFileDescriptor
 
 /**
  * Implements a [Socket] backed by a native Unix domain socket.
@@ -33,8 +33,8 @@ import sssemil.com.socket.ReferenceCountedFileDescriptor
 class UnixDomainSocket : Socket {
 
     private val fd: ReferenceCountedFileDescriptor
-    private val `is`: InputStream
-    private val os: OutputStream
+    private val inputStream: InputStream
+    private val outputStream: OutputStream
 
     /**
      * Creates a Unix domain socket backed by a file path.
@@ -51,12 +51,11 @@ class UnixDomainSocket : Socket {
             val socketFd = fd.get()
             UnixDomainSocketLibrary.connect(socketFd, address, address.size())
             this.fd = ReferenceCountedFileDescriptor(socketFd)
-            this.`is` = UnixDomainSocketInputStream()
-            this.os = UnixDomainSocketOutputStream()
+            this.inputStream = UnixDomainSocketInputStream()
+            this.outputStream = UnixDomainSocketOutputStream()
         } catch (e: LastErrorException) {
             throw IOException(e)
         }
-
     }
 
     /**
@@ -64,16 +63,16 @@ class UnixDomainSocket : Socket {
      */
     constructor(fd: Int) {
         this.fd = ReferenceCountedFileDescriptor(fd)
-        this.`is` = UnixDomainSocketInputStream()
-        this.os = UnixDomainSocketOutputStream()
+        this.inputStream = UnixDomainSocketInputStream()
+        this.outputStream = UnixDomainSocketOutputStream()
     }
 
     override fun getInputStream(): InputStream {
-        return `is`
+        return inputStream
     }
 
     override fun getOutputStream(): OutputStream {
-        return os
+        return outputStream
     }
 
     @Throws(IOException::class)
@@ -89,7 +88,6 @@ class UnixDomainSocket : Socket {
         } catch (e: LastErrorException) {
             throw IOException(e)
         }
-
     }
 
     @Throws(IOException::class)
