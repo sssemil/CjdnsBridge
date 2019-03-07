@@ -16,6 +16,7 @@
 package sssemil.com.bridge
 
 import sssemil.com.bridge.cjdns.CjdnsLayer
+import sssemil.com.bridge.interfaces.ConfigurationCallback
 import sssemil.com.bridge.util.Logger
 import sssemil.com.bridge.util.toHexString
 import sssemil.com.net.layers.Layer
@@ -23,6 +24,16 @@ import sssemil.com.net.layers.network.IdentityLayer
 import sssemil.com.net.layers.network.NetworkLayer
 import java.io.File
 import java.lang.System.exit
+import java.net.Inet6Address
+
+val configurationCallback = object : ConfigurationCallback {
+
+    override fun addAddress(inet6Address: Inet6Address) {
+    }
+
+    override fun setMtu(mtu: UInt) {
+    }
+}
 
 fun main(args: Array<String>) {
     if (args.size != 1) {
@@ -46,7 +57,7 @@ fun exec(socket: File) {
     try {
         layers.addAll(
             listOf(
-                CjdnsLayer(socket.absolutePath, true),
+                CjdnsLayer(socket.absolutePath, true, configurationCallback),
                 IdentityLayer { buffer, offset, length ->
                     Logger.d("read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}")
                 },
