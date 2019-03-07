@@ -32,7 +32,7 @@ public interface Win32NamedPipeLibrary extends Library, WinNT {
   int FILE_FLAG_FIRST_PIPE_INSTANCE = 524288;
 
   Win32NamedPipeLibrary INSTANCE =
-      Native.loadLibrary(
+      Native.load(
           "kernel32",
           Win32NamedPipeLibrary.class,
           W32APIOptions.UNICODE_OPTIONS);
