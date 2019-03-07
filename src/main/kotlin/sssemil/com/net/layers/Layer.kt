@@ -71,7 +71,7 @@ abstract class Layer {
     fun unbindUp(layer: Layer, first: Boolean = true) {
         if (first) {
             upLinks.filter { it == layer }
-                    .forEach { it.unbindDown(this, false) }
+                .forEach { it.unbindDown(this, false) }
         }
         upLinks.remove(layer)
     }
@@ -86,7 +86,7 @@ abstract class Layer {
     fun unbindDown(layer: Layer, first: Boolean = true) {
         if (first) {
             downLinks.filter { it == layer }
-                    .forEach { it.unbindUp(this, false) }
+                .forEach { it.unbindUp(this, false) }
         }
         downLinks.remove(layer)
     }

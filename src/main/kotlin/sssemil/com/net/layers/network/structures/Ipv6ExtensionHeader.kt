@@ -19,8 +19,10 @@ package sssemil.com.net.layers.network.structures
 import java.io.DataInputStream
 import java.util.*
 
-data class Ipv6ExtensionHeader(val nextHeader: Byte = 0, val headerExtensionLength: Byte = 0,
-                               val content: ByteArray = byteArrayOf()) {
+data class Ipv6ExtensionHeader(
+    val nextHeader: Byte = 0, val headerExtensionLength: Byte = 0,
+    val content: ByteArray = byteArrayOf()
+) {
     fun build(): ByteArray {
         val arr = ArrayList<Byte>()
         arr.add(nextHeader)

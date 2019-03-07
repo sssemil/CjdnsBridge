@@ -44,13 +44,15 @@ fun main(args: Array<String>) {
 fun exec(socket: File) {
     val layers = ArrayList<Layer>()
     try {
-        layers.addAll(listOf(
+        layers.addAll(
+            listOf(
                 CjdnsLayer(socket.absolutePath, true),
                 IdentityLayer { buffer, offset, length ->
                     Logger.d("read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}")
                 },
                 NetworkLayer()
-        ))
+            )
+        )
 
         for (i in 0 until layers.size - 1) {
             layers[i].bindUp(layers[i + 1])

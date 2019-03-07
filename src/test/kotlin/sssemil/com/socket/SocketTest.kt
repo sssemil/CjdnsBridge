@@ -52,7 +52,8 @@ class SocketTest {
         val client = SocketHelper.createSocket(sock.toString())
         val writer = PrintWriter(client!!.outputStream, true)
         val reader = BufferedReader(
-                InputStreamReader(client.inputStream))
+            InputStreamReader(client.inputStream)
+        )
         writer.println("hello")
         val line = reader.readLine()
         client.close()

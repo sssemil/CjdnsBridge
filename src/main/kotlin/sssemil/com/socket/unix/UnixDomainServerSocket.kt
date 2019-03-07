@@ -61,10 +61,12 @@ class UnixDomainServerSocket
     init {
         try {
             fd = AtomicInteger(
-                    UnixDomainSocketLibrary.socket(
-                            UnixDomainSocketLibrary.PF_LOCAL,
-                            UnixDomainSocketLibrary.SOCK_STREAM,
-                            0))
+                UnixDomainSocketLibrary.socket(
+                    UnixDomainSocketLibrary.PF_LOCAL,
+                    UnixDomainSocketLibrary.SOCK_STREAM,
+                    0
+                )
+            )
             this.backlog = backlog
             if (path != null) {
                 bind(UnixDomainServerSocketAddress(path))
@@ -80,7 +82,8 @@ class UnixDomainServerSocket
     override fun bind(endpoint: PipeSocketAddress) {
         if (endpoint !is UnixDomainServerSocketAddress) {
             throw IllegalArgumentException(
-                    "endpoint must be an instance of UnixDomainServerSocketAddress")
+                "endpoint must be an instance of UnixDomainServerSocketAddress"
+            )
         }
         if (isBoundVar) {
             throw IllegalStateException("Socket is already bound")
@@ -122,7 +125,6 @@ class UnixDomainServerSocket
         } catch (e: LastErrorException) {
             throw IOException(e)
         }
-
     }
 
     @Synchronized

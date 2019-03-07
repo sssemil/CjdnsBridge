@@ -25,16 +25,18 @@ import java.io.DataInputStream
 import java.net.Inet6Address
 import java.util.*
 
-data class Ipv6Packet(val version: Octet = IPV6,
-                      val trafficClass: Byte = 0,
-                      val flowLabel: Array<Octet> = Array(5) { 0.toOctet() },
-                      var payloadLength: Short = 0,
-                      val nextHeader: Byte = UDP,
-                      val hopLimit: Byte,
-                      val sourceAddress: Inet6Address,
-                      val destinationAddress: Inet6Address,
-                      val extensionHeaders: Array<Ipv6ExtensionHeader> = Array(0) { Ipv6ExtensionHeader() },
-                      val payload: Payload? = null) {
+data class Ipv6Packet(
+    val version: Octet = IPV6,
+    val trafficClass: Byte = 0,
+    val flowLabel: Array<Octet> = Array(5) { 0.toOctet() },
+    var payloadLength: Short = 0,
+    val nextHeader: Byte = UDP,
+    val hopLimit: Byte,
+    val sourceAddress: Inet6Address,
+    val destinationAddress: Inet6Address,
+    val extensionHeaders: Array<Ipv6ExtensionHeader> = Array(0) { Ipv6ExtensionHeader() },
+    val payload: Payload? = null
+) {
     fun build(): ByteArray {
         val arr = ArrayList<Byte>()
 
@@ -93,8 +95,9 @@ data class Ipv6Packet(val version: Octet = IPV6,
 
             var nextHeaderTmp = nextHeader
             while (nextHeaderTmp == HOPOPT
-                    || nextHeaderTmp == IPV6_ROUTE
-                    || nextHeaderTmp == IPV6_OPTS) {
+                || nextHeaderTmp == IPV6_ROUTE
+                || nextHeaderTmp == IPV6_OPTS
+            ) {
                 val e = Ipv6ExtensionHeader.parse(this)
                 nextHeaderTmp = e.nextHeader
                 extensionHeaders.add(e)
@@ -105,14 +108,14 @@ data class Ipv6Packet(val version: Octet = IPV6,
             } else UnknownPayload.parse(this)
 
             return Ipv6Packet(
-                    version = version,
-                    payloadLength = payloadLength,
-                    nextHeader = nextHeader,
-                    hopLimit = hopLimit,
-                    sourceAddress = Inet6Address.getByAddress(sourceAddress) as Inet6Address,
-                    destinationAddress = Inet6Address.getByAddress(destinationAddress) as Inet6Address,
-                    extensionHeaders = extensionHeaders.toArray(Array(extensionHeaders.size) { Ipv6ExtensionHeader() }),
-                    payload = payload
+                version = version,
+                payloadLength = payloadLength,
+                nextHeader = nextHeader,
+                hopLimit = hopLimit,
+                sourceAddress = Inet6Address.getByAddress(sourceAddress) as Inet6Address,
+                destinationAddress = Inet6Address.getByAddress(destinationAddress) as Inet6Address,
+                extensionHeaders = extensionHeaders.toArray(Array(extensionHeaders.size) { Ipv6ExtensionHeader() }),
+                payload = payload
             )
         }
 

@@ -20,11 +20,13 @@ import sssemil.com.bridge.util.toBytes
 import java.io.DataInputStream
 import java.util.*
 
-data class Icmp6Packet(val type: Byte = ECHO_REQUEST,
-                       val code: Byte = 0,
-                       var checksum: Short = 0,
-                       val identifier: Short = 0,
-                       val sequenceNumber: Short = 0) : Payload() {
+data class Icmp6Packet(
+    val type: Byte = ECHO_REQUEST,
+    val code: Byte = 0,
+    var checksum: Short = 0,
+    val identifier: Short = 0,
+    val sequenceNumber: Short = 0
+) : Payload() {
 
     override fun build(): ByteArray {
         val arr = ArrayList<Byte>()
@@ -47,11 +49,11 @@ data class Icmp6Packet(val type: Byte = ECHO_REQUEST,
             val sequenceNumber = readShort()
 
             return@with Icmp6Packet(
-                    type = type,
-                    code = code,
-                    checksum = checksum,
-                    identifier = identifier,
-                    sequenceNumber = sequenceNumber
+                type = type,
+                code = code,
+                checksum = checksum,
+                identifier = identifier,
+                sequenceNumber = sequenceNumber
             )
         }
 

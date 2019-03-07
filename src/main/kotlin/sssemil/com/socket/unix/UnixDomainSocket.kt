@@ -41,10 +41,12 @@ class UnixDomainSocket : PipeSocket {
     constructor(path: String) {
         try {
             val fd = AtomicInteger(
-                    UnixDomainSocketLibrary.socket(
-                            UnixDomainSocketLibrary.PF_LOCAL,
-                            UnixDomainSocketLibrary.SOCK_STREAM,
-                            0))
+                UnixDomainSocketLibrary.socket(
+                    UnixDomainSocketLibrary.PF_LOCAL,
+                    UnixDomainSocketLibrary.SOCK_STREAM,
+                    0
+                )
+            )
             val address = SockAddrUn(path)
             val socketFd = fd.get()
             UnixDomainSocketLibrary.connect(socketFd, address, address.size())
@@ -172,8 +174,10 @@ class UnixDomainSocket : PipeSocket {
                 val ret = UnixDomainSocketLibrary.write(fdToWrite, buf, buf.remaining())
                 if (ret != buf.remaining()) {
                     // This shouldn't happen with standard blocking Unix domain sockets.
-                    throw IOException("Could not write " + buf.remaining() + " bytes as requested " +
-                            "(wrote " + ret + " bytes instead)")
+                    throw IOException(
+                        "Could not write " + buf.remaining() + " bytes as requested " +
+                                "(wrote " + ret + " bytes instead)"
+                    )
                 }
             } catch (e: LastErrorException) {
                 throw IOException(e)

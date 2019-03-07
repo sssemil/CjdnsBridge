@@ -55,7 +55,8 @@ class CjdnsLayer(path: String, noPi: Boolean) : Layer() {
 
     override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) = false
 
-    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) = cjdnsSocket.write(buffer, offset, length)
+    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) =
+        cjdnsSocket.write(buffer, offset, length)
 
     override fun kill() {
         cjdnsSocket.kill()

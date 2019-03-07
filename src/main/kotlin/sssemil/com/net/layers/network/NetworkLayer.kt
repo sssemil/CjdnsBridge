@@ -38,16 +38,16 @@ class NetworkLayer : Layer() {
             Logger.i(ipv6Packet.toString())
 
             val returnPacket = Ipv6Packet(
-                    ipv6Packet.version,
-                    ipv6Packet.trafficClass,
-                    ipv6Packet.flowLabel,
-                    ipv6Packet.payloadLength,
-                    ipv6Packet.nextHeader,
-                    ipv6Packet.hopLimit,
-                    ipv6Packet.destinationAddress,
-                    ipv6Packet.sourceAddress,
-                    ipv6Packet.extensionHeaders,
-                    ipv6Packet.payload
+                ipv6Packet.version,
+                ipv6Packet.trafficClass,
+                ipv6Packet.flowLabel,
+                ipv6Packet.payloadLength,
+                ipv6Packet.nextHeader,
+                ipv6Packet.hopLimit,
+                ipv6Packet.destinationAddress,
+                ipv6Packet.sourceAddress,
+                ipv6Packet.extensionHeaders,
+                ipv6Packet.payload
             )
 
             returnPacket.build().let {

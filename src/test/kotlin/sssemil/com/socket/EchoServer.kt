@@ -34,7 +34,8 @@ class EchoServer(private val serverSocket: PipeServerSocket) {
                 try {
                     val writer = PrintWriter(clientSocket.outputStream, true)
                     val reader = BufferedReader(
-                            InputStreamReader(clientSocket.inputStream))
+                        InputStreamReader(clientSocket.inputStream)
+                    )
                     var line: String?
                     do {
                         line = reader.readLine()
