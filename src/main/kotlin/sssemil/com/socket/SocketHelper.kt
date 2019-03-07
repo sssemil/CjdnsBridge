@@ -18,11 +18,11 @@ package sssemil.com.socket
 
 import com.sun.jna.Platform
 import sssemil.com.socket.interfaces.OnAcceptSocketListener
+import sssemil.com.socket.interfaces.PipeServerSocket
 import sssemil.com.socket.unix.UnixDomainServerSocket
 import sssemil.com.socket.unix.UnixDomainSocket
 import sssemil.com.socket.win32.Win32NamedPipeServerSocket
 import sssemil.com.socket.win32.Win32NamedPipeSocket
-import java.net.ServerSocket
 
 object SocketHelper {
 
@@ -39,7 +39,7 @@ object SocketHelper {
     }
 }
 
-fun ServerSocket.onAccept(callback: OnAcceptSocketListener) {
+fun PipeServerSocket.onAccept(callback: OnAcceptSocketListener) {
     while (callback.keepRunning()) {
         accept().let {
             callback.accepted(it)

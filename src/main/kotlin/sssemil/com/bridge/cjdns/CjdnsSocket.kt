@@ -19,8 +19,8 @@ package sssemil.com.bridge.cjdns
 import sssemil.com.bridge.util.Logger
 import sssemil.com.socket.SocketHelper
 import sssemil.com.socket.interfaces.OnAcceptSocketListener
+import sssemil.com.socket.interfaces.PipeSocket
 import sssemil.com.socket.onAccept
-import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 
@@ -30,7 +30,7 @@ class CjdnsSocket(path: String) {
 
     private val socketLock = Object()
 
-    private var socket: Socket? = null
+    private var socket: PipeSocket? = null
 
     /**
      * Get notified on new client.
@@ -42,7 +42,7 @@ class CjdnsSocket(path: String) {
     init {
         socketThread = thread {
             SocketHelper.createServerSocket(path)?.onAccept(object : OnAcceptSocketListener {
-                override fun accepted(socket: Socket) {
+                override fun accepted(socket: PipeSocket) {
                     Logger.d("Accepted client socket: $socket")
                     synchronized(socketLock) {
                         this@CjdnsSocket.socket?.close()
@@ -57,7 +57,7 @@ class CjdnsSocket(path: String) {
     }
 
     /**
-     * KIll the socket by stopping its main thread.
+     * Kill the socket by stopping its main thread.
      */
     fun kill() {
         keepRunning.set(false)
@@ -84,7 +84,7 @@ class CjdnsSocket(path: String) {
      */
     fun write(buffer: ByteArray, offset: Int, length: Int): Boolean {
         synchronized(socketLock) {
-            socket?.getOutputStream()?.write(buffer, offset, length) ?: run {
+            socket?.outputStream?.write(buffer, offset, length) ?: run {
                 Logger.w("There is no valid client yet!")
                 return false
             }
@@ -102,7 +102,7 @@ class CjdnsSocket(path: String) {
      */
     fun read(buffer: ByteArray): Int {
         synchronized(socketLock) {
-            socket?.getInputStream()?.let {
+            socket?.inputStream?.let {
                 return it.read(buffer)
             } ?: run {
                 Logger.w("There is no valid client yet!")
@@ -112,6 +112,7 @@ class CjdnsSocket(path: String) {
     }
 
     companion object {
+
         private const val THREAD_TIMEOUT = 3000L // 3s
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Emil Suleymanov
+ * Copyright 2019 Emil Suleymanov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,22 @@
 
 package sssemil.com.socket.interfaces
 
-interface OnAcceptSocketListener {
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
-    /**
-     * Here you will get incoming socket.
-     */
-    fun accepted(socket: PipeSocket)
+interface PipeSocket {
 
-    /**
-     * Tell if should keep listening.
-     */
-    fun keepRunning(): Boolean
+    val inputStream: InputStream?
+
+    val outputStream: OutputStream?
+
+    @Throws(IOException::class)
+    fun close()
+
+    @Throws(IOException::class)
+    fun shutdownInput()
+
+    @Throws(IOException::class)
+    fun shutdownOutput()
 }

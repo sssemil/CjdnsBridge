@@ -17,14 +17,14 @@
 
 package sssemil.com.socket
 
+import sssemil.com.socket.interfaces.PipeServerSocket
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
-import java.net.ServerSocket
 import java.util.concurrent.CompletableFuture
 
-class EchoServer(private val serverSocket: ServerSocket) {
+class EchoServer(private val serverSocket: PipeServerSocket) {
 
     @Throws(IOException::class)
     fun run() {
@@ -32,9 +32,9 @@ class EchoServer(private val serverSocket: ServerSocket) {
             val clientSocket = serverSocket.accept()
             CompletableFuture.supplyAsync {
                 try {
-                    val writer = PrintWriter(clientSocket.getOutputStream(), true)
+                    val writer = PrintWriter(clientSocket.outputStream, true)
                     val reader = BufferedReader(
-                            InputStreamReader(clientSocket.getInputStream()))
+                            InputStreamReader(clientSocket.inputStream))
                     var line: String?
                     do {
                         line = reader.readLine()

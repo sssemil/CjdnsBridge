@@ -18,23 +18,21 @@ package sssemil.com.socket.unix
 
 import com.sun.jna.LastErrorException
 import sssemil.com.socket.ReferenceCountedFileDescriptor
+import sssemil.com.socket.interfaces.PipeSocket
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.net.Socket
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Implements a [Socket] backed by a native Unix domain socket.
- *
- * Instances of this class always return `null` for [Socket.getInetAddress], [ ][Socket.getLocalAddress], [Socket.getLocalSocketAddress], [ ][Socket.getRemoteSocketAddress].
+ * Implements a [PipeSocket] backed by a native Unix domain socket.
  */
-class UnixDomainSocket : Socket {
+class UnixDomainSocket : PipeSocket {
 
     private val fd: ReferenceCountedFileDescriptor
-    private val inputStream: InputStream
-    private val outputStream: OutputStream
+    override val inputStream: InputStream
+    override val outputStream: OutputStream
 
     /**
      * Creates a Unix domain socket backed by a file path.
@@ -67,17 +65,8 @@ class UnixDomainSocket : Socket {
         this.outputStream = UnixDomainSocketOutputStream()
     }
 
-    override fun getInputStream(): InputStream {
-        return inputStream
-    }
-
-    override fun getOutputStream(): OutputStream {
-        return outputStream
-    }
-
     @Throws(IOException::class)
     override fun close() {
-        super.close()
         try {
             // This might not close the FD right away. In case we are about
             // to read or write on another thread, it will delay the close
@@ -119,14 +108,12 @@ class UnixDomainSocket : Socket {
         @Throws(IOException::class)
         override fun read(): Int {
             val buf = ByteBuffer.allocate(1)
-            val result: Int
-            if (doRead(buf) == 0) {
-                result = -1
+            return if (doRead(buf) == 0) {
+                -1
             } else {
                 // Make sure to & with 0xFF to avoid sign extension
-                result = 0xFF and buf.get().toInt()
+                0xFF and buf.get().toInt()
             }
-            return result
         }
 
         @Throws(IOException::class)

@@ -23,14 +23,15 @@ import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.jetbrains.annotations.NotNull;
+import sssemil.com.socket.interfaces.PipeServerSocket;
+import sssemil.com.socket.interfaces.PipeSocket;
+import sssemil.com.socket.interfaces.PipeSocketAddress;
 
-public class Win32NamedPipeServerSocket extends ServerSocket {
+public class Win32NamedPipeServerSocket implements PipeServerSocket {
 
   private static final Win32NamedPipeLibrary API = Win32NamedPipeLibrary.INSTANCE;
   private static final String WIN32_PIPE_PREFIX = "\\\\.\\pipe\\";
@@ -126,11 +127,12 @@ public class Win32NamedPipeServerSocket extends ServerSocket {
     API.CloseHandle(handle);
   }
 
-  public void bind(SocketAddress endpoint) throws IOException {
+  public void bind(@NotNull PipeSocketAddress endpoint) throws IOException {
     throw new IOException("Win32 named pipes do not support bind(), pass path to constructor");
   }
 
-  public Socket accept() throws IOException {
+  @NotNull
+  public PipeSocket accept() throws IOException {
     SECURITY_ATTRIBUTES sa = Win32SecurityLibrary
         .createSecurityWithLogonDacl(WinNT.FILE_ALL_ACCESS);
     HANDLE handle = API.CreateNamedPipe(

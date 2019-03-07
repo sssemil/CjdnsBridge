@@ -25,10 +25,11 @@ import com.sun.jna.ptr.IntByReference;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 import java.nio.ByteBuffer;
+import org.jetbrains.annotations.NotNull;
+import sssemil.com.socket.interfaces.PipeSocket;
 
-public class Win32NamedPipeSocket extends Socket {
+public class Win32NamedPipeSocket implements PipeSocket {
 
   static final boolean DEFAULT_REQUIRE_STRICT_LENGTH = false;
   private static final Win32NamedPipeLibrary API = Win32NamedPipeLibrary.INSTANCE;
@@ -93,11 +94,13 @@ public class Win32NamedPipeSocket extends Socket {
     };
   }
 
+  @NotNull
   @Override
   public InputStream getInputStream() {
     return is;
   }
 
+  @NotNull
   @Override
   public OutputStream getOutputStream() {
     return os;

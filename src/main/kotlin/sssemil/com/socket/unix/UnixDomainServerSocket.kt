@@ -18,19 +18,19 @@ package sssemil.com.socket.unix
 
 import com.sun.jna.LastErrorException
 import com.sun.jna.ptr.IntByReference
+import sssemil.com.socket.interfaces.PipeServerSocket
+import sssemil.com.socket.interfaces.PipeSocket
+import sssemil.com.socket.interfaces.PipeSocketAddress
 import java.io.IOException
-import java.net.ServerSocket
-import java.net.Socket
-import java.net.SocketAddress
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Implements a [ServerSocket] which binds to a local Unix domain socket and returns instances
- * of [UnixDomainSocket] from [.accept].
+ * Implements a [PipeServerSocket] which binds to a local Unix domain socket and returns instances
+ * of [UnixDomainSocket] from [accept].
  */
 class UnixDomainServerSocket
 @Throws(IOException::class)
-@JvmOverloads constructor(backlog: Int = DEFAULT_BACKLOG, path: String? = null) : ServerSocket() {
+@JvmOverloads constructor(backlog: Int = DEFAULT_BACKLOG, path: String? = null) : PipeServerSocket {
 
     // We use an AtomicInteger to prevent a race in this situation which
     // could happen if fd were just an int:
@@ -77,7 +77,7 @@ class UnixDomainServerSocket
 
     @Synchronized
     @Throws(IOException::class)
-    override fun bind(endpoint: SocketAddress) {
+    override fun bind(endpoint: PipeSocketAddress) {
         if (endpoint !is UnixDomainServerSocketAddress) {
             throw IllegalArgumentException(
                     "endpoint must be an instance of UnixDomainServerSocketAddress")
@@ -101,7 +101,7 @@ class UnixDomainServerSocket
     }
 
     @Throws(IOException::class)
-    override fun accept(): Socket {
+    override fun accept(): PipeSocket {
         // We explicitly do not make this method synchronized, since the
         // call to UnixDomainSocketLibrary.accept() will block
         // indefinitely, causing another thread's call to close() to deadlock.
@@ -147,7 +147,7 @@ class UnixDomainServerSocket
     @Throws(IOException::class)
     constructor(path: String) : this(DEFAULT_BACKLOG, path)
 
-    class UnixDomainServerSocketAddress(val path: String) : SocketAddress()
+    class UnixDomainServerSocketAddress(val path: String) : PipeSocketAddress
 
     companion object {
 
