@@ -22,7 +22,6 @@ import sssemil.com.net.layers.Layer
 import java.net.Inet6Address
 import java.net.UnknownHostException
 import java.nio.BufferUnderflowException
-import java.nio.ByteBuffer
 
 /**
  * This layer spits IPv6 packets from cjdns.
@@ -45,46 +44,56 @@ class CjdnsLayer(path: String, noPi: Boolean, configurationCallback: Configurati
     private val cjdnsSocket = CjdnsSocket(path)
 
     init {
-        val bufferArray = ByteArray(BUFFER_SIZE)
+        val buffer = ByteArray(BUFFER_SIZE)
         var readCount: Int
+        var position = 0
 
         cjdnsSocket.onAcceptListener = {
             do {
-                readCount = cjdnsSocket.read(bufferArray)
-                val buffer = ByteBuffer.wrap(bufferArray)
+                readCount = cjdnsSocket.read(buffer)
 
                 if (readCount >= 1) {
-                    when (buffer.get()) {
-                        TYPE_CJDNS_PACKET ->
-                            spitUp(
-                                ByteArray(buffer.remaining()) { buffer.get() },
-                                PREFIX_SIZE + if (noPi) NO_PI_OFFSET else 0,
-                                readCount
-                            )
-                        TYPE_CONF_ADD_IPV6_ADDRESS ->
-                            try {
-                                val ipv6 = Inet6Address.getByAddress(
-                                    ByteArray(16) { buffer.get() }
-                                ) as Inet6Address
-                                Logger.d("CONF_ADD_IPV6_ADDRESS: ${ipv6.hostAddress}")
-                                configurationCallback.addAddress(ipv6)
-                            } catch (e: BufferUnderflowException) {
-                                Logger.e("Too short for a valid IPv6 address!", e)
-                            } catch (e: UnknownHostException) {
-                                Logger.e("Couldn't parse IPv6 address!", e)
+                    while (position < readCount) {
+                        when (buffer[position++]) {
+                            TYPE_CJDNS_PACKET -> {
+                                spitUp(
+                                    buffer, position + if (noPi) NO_PI_OFFSET else 0, readCount
+                                )
+                                position = readCount
                             }
-                        TYPE_CONF_SET_MTU -> {
-                            try {
-                                val mtu = buffer.int.toUInt()
-                                Logger.d("CONF_SET_MTU: $mtu")
-                                configurationCallback.setMtu(mtu)
-                            } catch (e: BufferUnderflowException) {
-                                Logger.e("Too short for a valid MTU!", e)
+                            TYPE_CONF_ADD_IPV6_ADDRESS -> {
+                                try {
+                                    if (readCount - position >= IPV6_ADDR_LENGTH) {
+                                        val ipv6 = Inet6Address.getByAddress(
+                                            buffer.sliceArray(position until position + IPV6_ADDR_LENGTH)
+                                        ) as Inet6Address
+                                        position += IPV6_ADDR_LENGTH
+                                        Logger.d("CONF_ADD_IPV6_ADDRESS: ${ipv6.hostAddress}")
+                                        configurationCallback.addAddress(ipv6)
+                                    } else {
+                                        Logger.e("Invalid size for an IPv6 address!")
+                                    }
+                                } catch (e: UnknownHostException) {
+                                    Logger.e("Couldn't parse IPv6 address!", e)
+                                }
+                            }
+                            TYPE_CONF_SET_MTU -> {
+                                try {
+                                    val mtu = byteArrayToInt(buffer, position).toUInt()
+                                    position += 4
+                                    Logger.d("CONF_SET_MTU: $mtu")
+                                    configurationCallback.setMtu(mtu)
+                                } catch (e: BufferUnderflowException) {
+                                    Logger.e("Too short for a valid MTU!", e)
+                                }
+                            }
+                            else -> {
+                                Logger.w("Unknown packet type: ${buffer[0]}")
+                                position = readCount
                             }
                         }
-                        else ->
-                            Logger.w("Unknown packet type: ${bufferArray[0]}")
                     }
+                    position = 0
                 }
             } while (readCount != -1)
 
@@ -103,12 +112,23 @@ class CjdnsLayer(path: String, noPi: Boolean, configurationCallback: Configurati
     }
 
     companion object {
-        const val PREFIX_SIZE = 1
+
         const val BUFFER_SIZE = 2048
         const val NO_PI_OFFSET = 4
+
+        const val IPV6_ADDR_LENGTH = 16
+
+        const val TYPE_PREFIX_SIZE = 1
 
         const val TYPE_CJDNS_PACKET: Byte = 0
         const val TYPE_CONF_ADD_IPV6_ADDRESS: Byte = 1
         const val TYPE_CONF_SET_MTU: Byte = 2
+
+        fun byteArrayToInt(bytes: ByteArray, offset: Int = 0): Int {
+            return (bytes[offset + 3].toInt() and 0xFF or (
+                    bytes[offset + 2].toInt() and 0xFF shl 8) or (
+                    bytes[offset + 1].toInt() and 0xFF shl 16) or (
+                    bytes[offset + 0].toInt() and 0xFF shl 24))
+        }
     }
 }
