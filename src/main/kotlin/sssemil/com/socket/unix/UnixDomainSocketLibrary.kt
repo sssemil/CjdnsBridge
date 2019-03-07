@@ -16,23 +16,23 @@
  */
 package sssemil.com.socket.unix
 
-import com.sun.jna.*
+import com.sun.jna.LastErrorException
+import com.sun.jna.Native
+import com.sun.jna.Platform
 import com.sun.jna.ptr.IntByReference
-import java.io.IOException
 import java.nio.ByteBuffer
-import java.util.*
 
 /**
  * Utility class to bridge native Unix domain socket calls to Java using JNA.
  */
 object UnixDomainSocketLibrary {
 
-    public const val PF_LOCAL = 1
-    public const val AF_LOCAL = 1
-    public const val SOCK_STREAM = 1
+    const val PF_LOCAL = 1
+    const val AF_LOCAL = 1
+    const val SOCK_STREAM = 1
 
-    public const val SHUT_RD = 0
-    public const val SHUT_WR = 1
+    const val SHUT_RD = 0
+    const val SHUT_WR = 1
 
     init {
         Native.register(Platform.C_LIBRARY_NAME)

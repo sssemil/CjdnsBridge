@@ -28,6 +28,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class SocketTest {
+
     @Test
     @Throws(IOException::class, InterruptedException::class)
     fun testAssertEquals() {
@@ -49,11 +50,11 @@ class SocketTest {
         Thread.sleep(100)
 
         val client = SocketHelper.createSocket(sock.toString())
-        val out = PrintWriter(client!!.getOutputStream(), true)
-        val `in` = BufferedReader(
+        val writer = PrintWriter(client!!.getOutputStream(), true)
+        val reader = BufferedReader(
                 InputStreamReader(client.getInputStream()))
-        out.println("hello")
-        val line = `in`.readLine()
+        writer.println("hello")
+        val line = reader.readLine()
         client.close()
         server.cancel(true)
         serverSocket!!.close()

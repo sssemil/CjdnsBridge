@@ -16,10 +16,10 @@
 
 package sssemil.com.bridge.cjdns
 
-import sssemil.com.socket.interfaces.OnAcceptSocketListener
-import sssemil.com.socket.SocketHelper
-import sssemil.com.socket.onAccept
 import sssemil.com.bridge.util.Logger
+import sssemil.com.socket.SocketHelper
+import sssemil.com.socket.interfaces.OnAcceptSocketListener
+import sssemil.com.socket.onAccept
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
@@ -38,7 +38,6 @@ class CjdnsSocket(path: String) {
     var onAcceptListener: (() -> Unit)? = null
 
     private var socketThread: Thread
-
 
     init {
         socketThread = thread {

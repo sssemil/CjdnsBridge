@@ -17,7 +17,7 @@
 package sssemil.com.net.layers
 
 import sssemil.com.bridge.util.Logger
-import java.util.LinkedList
+import java.util.*
 
 abstract class Layer {
 
