@@ -118,8 +118,6 @@ class CjdnsLayer(path: String, noPi: Boolean, configurationCallback: Configurati
 
         const val IPV6_ADDR_LENGTH = 16
 
-        const val TYPE_PREFIX_SIZE = 1
-
         const val TYPE_CJDNS_PACKET: Byte = 0
         const val TYPE_CONF_ADD_IPV6_ADDRESS: Byte = 1
         const val TYPE_CONF_SET_MTU: Byte = 2
