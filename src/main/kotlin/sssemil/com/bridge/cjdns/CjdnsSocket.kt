@@ -16,15 +16,13 @@
 
 package sssemil.com.bridge.cjdns
 
+import kotlinx.coroutines.*
 import sssemil.com.bridge.util.Logger
 import sssemil.com.socket.SocketHelper
-import sssemil.com.socket.interfaces.OnAcceptSocketListener
 import sssemil.com.socket.interfaces.PipeSocket
-import sssemil.com.socket.onAccept
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.concurrent.thread
 
-class CjdnsSocket(path: String) {
+class CjdnsSocket(scope: CoroutineScope, path: String) {
 
     private val keepRunning = AtomicBoolean(true)
 
@@ -37,32 +35,33 @@ class CjdnsSocket(path: String) {
      */
     var onAcceptListener: (() -> Unit)? = null
 
-    private var socketThread: Thread
+    private var socketThread: Job
 
     init {
-        socketThread = thread {
-            SocketHelper.createServerSocket(path)?.onAccept(object : OnAcceptSocketListener {
-                override fun accepted(socket: PipeSocket) {
-                    Logger.d("Accepted client socket: $socket")
-                    synchronized(socketLock) {
-                        this@CjdnsSocket.socket?.close()
-                        this@CjdnsSocket.socket = socket
+        socketThread = scope.launch {
+            SocketHelper.createServerSocket(path)?.let { socket ->
+                while (keepRunning.get()) {
+                    withContext(Dispatchers.IO) {
+                        socket.accept().let {
+                            Logger.d("Accepted client socket: $socket")
+                            synchronized(socketLock) {
+                                this@CjdnsSocket.socket?.close()
+                                this@CjdnsSocket.socket = it
+                            }
+                            onAcceptListener?.invoke()
+                        }
                     }
-                    onAcceptListener?.invoke()
                 }
-
-                override fun keepRunning() = keepRunning.get()
-            })
+            }
         }
     }
 
     /**
      * Kill the socket by stopping its main thread.
      */
-    fun kill() {
+    suspend fun kill() {
         keepRunning.set(false)
-        socketThread.join(THREAD_TIMEOUT)
-        socketThread.interrupt()
+        socketThread.cancelAndJoin()
     }
 
     /**
@@ -109,10 +108,5 @@ class CjdnsSocket(path: String) {
                 return -1
             }
         }
-    }
-
-    companion object {
-
-        private const val THREAD_TIMEOUT = 3000L // 3s
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Emil Suleymanov
+ * Copyright 2019 Emil Suleymanov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network.structures
+package sssemil.com.net.stack.transport
 
-import java.io.DataInputStream
+import kotlinx.coroutines.CoroutineScope
+import sssemil.com.bridge.util.Logger
+import sssemil.com.net.stack.Protocol
 
-data class UnknownPayload(val data: ByteArray) : Payload() {
-    override fun build() = data
+class TcpProtocol(scope: CoroutineScope) : Protocol(scope) {
 
-    companion object {
-        fun parse(stream: DataInputStream): UnknownPayload {
-            return UnknownPayload(stream.readBytes())
-        }
+    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
+        handle(buffer.sliceArray(offset until length))
+    }
+
+    private fun handle(packet: ByteArray) {
+        Logger.d("TcpProtocol: Not yet implemented!!!")
     }
 }

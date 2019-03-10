@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network.exceptions
+package sssemil.com.net.stack.exceptions
 
-class InvalidTypeException(message: String) : RuntimeException(message)
+class EmptyPacketException(message: String) : RuntimeException(message)

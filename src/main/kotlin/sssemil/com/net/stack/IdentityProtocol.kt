@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Emil Suleymanov
+ * Copyright 2019 Emil Suleymanov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network
+package sssemil.com.net.stack
 
-import sssemil.com.net.layers.Layer
+import kotlinx.coroutines.CoroutineScope
 
-class IdentityLayer(private val function: (buffer: ByteArray, offset: Int, length: Int) -> Unit) : Layer() {
+class IdentityProtocol(
+    scope: CoroutineScope,
+    private val function: ((buffer: ByteArray, offset: Int, length: Int) -> Unit)? = null
+) :
+    Protocol(scope) {
 
-    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int): Boolean {
-        function.invoke(buffer, offset, length)
+    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) {
+        function?.invoke(buffer, offset, length)
         spitDown(buffer, offset, length)
-        return true
     }
 
-    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int): Boolean {
-        function.invoke(buffer, offset, length)
+    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
+        function?.invoke(buffer, offset, length)
         spitUp(buffer, offset, length)
-        return true
     }
 }

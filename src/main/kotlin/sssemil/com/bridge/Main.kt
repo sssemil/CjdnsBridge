@@ -15,13 +15,15 @@
  */
 package sssemil.com.bridge
 
-import sssemil.com.bridge.cjdns.CjdnsLayer
+import kotlinx.coroutines.*
+import sssemil.com.bridge.cjdns.CjdnsProtocol
 import sssemil.com.bridge.interfaces.ConfigurationCallback
 import sssemil.com.bridge.util.Logger
-import sssemil.com.bridge.util.toHexString
-import sssemil.com.net.layers.Layer
-import sssemil.com.net.layers.network.IdentityLayer
-import sssemil.com.net.layers.network.NetworkLayer
+import sssemil.com.net.stack.Layer
+import sssemil.com.net.stack.LoggerProtocol
+import sssemil.com.net.stack.network.Ipv6Protocol
+import sssemil.com.net.stack.transport.TcpProtocol
+import sssemil.com.net.stack.transport.UdpProtocol
 import java.io.File
 import java.lang.System.exit
 import java.net.Inet6Address
@@ -35,7 +37,10 @@ val configurationCallback = object : ConfigurationCallback {
     }
 }
 
-fun main(args: Array<String>) {
+val job = SupervisorJob()
+val scope = CoroutineScope(Dispatchers.Default + job)
+
+fun main(args: Array<String>) = runBlocking {
     if (args.size != 1) {
         printUsageAndExit()
     } else {
@@ -52,25 +57,26 @@ fun main(args: Array<String>) {
     }
 }
 
-fun exec(socket: File) {
+suspend fun exec(socket: File) {
     val layers = ArrayList<Layer>()
     try {
-        layers.addAll(
-            listOf(
-                CjdnsLayer(socket.absolutePath, true, configurationCallback),
-                IdentityLayer { buffer, offset, length ->
-                    Logger.d("read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}")
-                },
-                NetworkLayer()
-            )
-        )
+        val linkLayer = Layer(CjdnsProtocol(scope, socket.absolutePath, configurationCallback))
+        val networkLayer = Layer(LoggerProtocol(scope, "NET"), Ipv6Protocol(scope))
+        val transportLayer = Layer(LoggerProtocol(scope, "TRN"), TcpProtocol(scope), UdpProtocol(scope))
+
+        layers.add(linkLayer)
+        layers.add(networkLayer)
+        layers.add(transportLayer)
 
         for (i in 0 until layers.size - 1) {
-            layers[i].bindUp(layers[i + 1])
+            layers[i].bind(layers[i + 1])
         }
+
+        job.join()
     } catch (e: Exception) {
         Logger.e("Error", e)
         layers.forEach { it.kill() }
+        scope.coroutineContext.cancelChildren()
         exit(-1)
     }
 }

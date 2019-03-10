@@ -17,8 +17,6 @@
 package sssemil.com.socket
 
 import com.sun.jna.Platform
-import sssemil.com.socket.interfaces.OnAcceptSocketListener
-import sssemil.com.socket.interfaces.PipeServerSocket
 import sssemil.com.socket.unix.UnixDomainServerSocket
 import sssemil.com.socket.unix.UnixDomainSocket
 import sssemil.com.socket.win32.Win32NamedPipeServerSocket
@@ -36,13 +34,5 @@ object SocketHelper {
         Platform.isWindows() -> Win32NamedPipeSocket(path)
         Platform.isLinux() -> UnixDomainSocket(path)
         else -> null
-    }
-}
-
-fun PipeServerSocket.onAccept(callback: OnAcceptSocketListener) {
-    while (callback.keepRunning()) {
-        accept().let {
-            callback.accepted(it)
-        }
     }
 }

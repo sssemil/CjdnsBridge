@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network
+package sssemil.com.net.stack.network
 
+import kotlinx.coroutines.CoroutineScope
 import sssemil.com.bridge.util.Logger
-import sssemil.com.net.layers.Layer
-import sssemil.com.net.layers.network.exceptions.EmptyPacketException
-import sssemil.com.net.layers.network.exceptions.InvalidTypeException
-import sssemil.com.net.layers.network.structures.Ipv6Packet
+import sssemil.com.net.stack.Protocol
+import sssemil.com.net.stack.exceptions.EmptyPacketException
+import sssemil.com.net.stack.exceptions.InvalidTypeException
+import sssemil.com.net.stack.network.structures.Ipv6Packet
 
-class NetworkLayer : Layer() {
+class Ipv6Protocol(scope: CoroutineScope) : Protocol(scope) {
 
-    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) = false
-
-    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int): Boolean {
+    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
         handle(buffer.sliceArray(offset until length))
-        return true
     }
 
     private fun handle(packet: ByteArray) {
@@ -51,7 +49,7 @@ class NetworkLayer : Layer() {
             )
 
             returnPacket.build().let {
-                spitDown(it, 0, it.size)
+                //spitDown(it, 0, it.size)
             }
         } catch (e: InvalidTypeException) {
             Logger.w("Can't parse packet type!\n")

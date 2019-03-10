@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network.exceptions
+package sssemil.com.net.stack.network.structures
 
-class EmptyPacketException(message: String) : RuntimeException(message)
+import java.io.DataInputStream
+
+data class UnknownPayload(val data: ByteArray) : Payload() {
+    override fun build() = data
+
+    companion object {
+        fun parse(stream: DataInputStream): UnknownPayload {
+            return UnknownPayload(stream.readBytes())
+        }
+    }
+}

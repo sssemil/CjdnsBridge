@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network.structures
+package sssemil.com.net.stack.network.structures
 
 import sssemil.com.bridge.util.toBytes
-import sssemil.com.net.layers.network.exceptions.EmptyPacketException
-import sssemil.com.net.layers.network.exceptions.InvalidTypeException
+import sssemil.com.net.stack.exceptions.EmptyPacketException
+import sssemil.com.net.stack.exceptions.InvalidTypeException
 import sssemil.com.net.util.number.Octet
 import sssemil.com.net.util.number.toOctet
 import java.io.DataInputStream

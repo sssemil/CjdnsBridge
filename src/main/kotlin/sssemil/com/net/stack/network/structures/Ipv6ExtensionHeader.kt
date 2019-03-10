@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network.structures
+package sssemil.com.net.stack.network.structures
 
 import java.io.DataInputStream
 import java.util.*

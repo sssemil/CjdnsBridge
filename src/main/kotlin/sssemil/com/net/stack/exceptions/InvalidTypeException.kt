@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.layers.network.structures
+package sssemil.com.net.stack.exceptions
 
-abstract class Payload {
-    abstract fun build(): ByteArray
-}
+class InvalidTypeException(message: String) : RuntimeException(message)

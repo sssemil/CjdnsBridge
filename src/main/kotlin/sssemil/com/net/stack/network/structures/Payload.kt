@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package sssemil.com.socket.interfaces
+package sssemil.com.net.stack.network.structures
 
-interface OnAcceptSocketListener {
-
-    /**
-     * Here you will get incoming socket.
-     */
-    fun accepted(socket: PipeSocket)
-
-    /**
-     * Tell if should keep listening.
-     */
-    fun keepRunning(): Boolean
+abstract class Payload {
+    abstract fun build(): ByteArray
 }
