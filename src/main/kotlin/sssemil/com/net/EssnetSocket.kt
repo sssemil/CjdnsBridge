@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.cjdns
+package sssemil.com.net
 
 import kotlinx.coroutines.*
 import sssemil.com.bridge.util.Logger
@@ -22,7 +22,7 @@ import sssemil.com.socket.SocketHelper
 import sssemil.com.socket.interfaces.PipeSocket
 import java.util.concurrent.atomic.AtomicBoolean
 
-class CjdnsSocket(scope: CoroutineScope, path: String) {
+class EssnetSocket(scope: CoroutineScope, path: String) {
 
     private val keepRunning = AtomicBoolean(true)
 
@@ -45,8 +45,8 @@ class CjdnsSocket(scope: CoroutineScope, path: String) {
                         socket.accept().let {
                             Logger.d("Accepted client socket: $socket")
                             synchronized(socketLock) {
-                                this@CjdnsSocket.socket?.close()
-                                this@CjdnsSocket.socket = it
+                                this@EssnetSocket.socket?.close()
+                                this@EssnetSocket.socket = it
                             }
                             onAcceptListener?.invoke()
                         }

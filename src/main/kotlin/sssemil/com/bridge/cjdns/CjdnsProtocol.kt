@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import sssemil.com.bridge.interfaces.ConfigurationCallback
 import sssemil.com.bridge.util.Logger
+import sssemil.com.net.EssnetSocket
 import sssemil.com.net.stack.Protocol
 import java.net.Inet6Address
 import java.net.UnknownHostException
@@ -48,10 +49,9 @@ class CjdnsProtocol(
     path: String,
     private val configurationCallback: ConfigurationCallback,
     private val noPi: Boolean = true
-) :
-    Protocol(scope) {
+) : Protocol(scope) {
 
-    private val cjdnsSocket = CjdnsSocket(scope, path)
+    private val cjdnsSocket = EssnetSocket(scope, path)
 
     init {
         cjdnsSocket.onAcceptListener = {
