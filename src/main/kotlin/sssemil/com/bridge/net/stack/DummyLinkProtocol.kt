@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack
+package sssemil.com.bridge.net.stack
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import sssemil.com.bridge.socket.EssClientHandle
-import sssemil.com.net.stack.network.structures.Ipv6Packet
+import sssemil.com.bridge.ess.EssClientHandle
+import sssemil.com.bridge.net.structures.Ipv6Packet
 import java.net.Inet6Address
 
 class DummyLinkProtocol(scope: CoroutineScope, private val delayLength: Long = 1000) : Protocol(scope) {

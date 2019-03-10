@@ -17,9 +17,9 @@
 package sssemil.com.bridge.cjdns
 
 import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.socket.EssClientHandle
-import sssemil.com.bridge.socket.EssSocket
-import sssemil.com.net.stack.Protocol
+import sssemil.com.bridge.ess.EssClientHandle
+import sssemil.com.bridge.ess.EssSocket
+import sssemil.com.bridge.net.stack.Protocol
 
 /**
  * This layer spits IPv6 packets from cjdns.

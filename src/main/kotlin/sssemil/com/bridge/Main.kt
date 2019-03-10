@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Emil Suleymanov
+ * Copyright 2019 Emil Suleymanov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package sssemil.com.bridge
 
 import kotlinx.coroutines.*
 import sssemil.com.bridge.cjdns.CjdnsProtocol
 import sssemil.com.bridge.util.Logger
-import sssemil.com.net.stack.Layer
-import sssemil.com.net.stack.LoggerProtocol
-import sssemil.com.net.stack.network.Ipv6Protocol
-import sssemil.com.net.stack.transport.TcpProtocol
-import sssemil.com.net.stack.transport.UdpProtocol
+import sssemil.com.bridge.net.stack.Layer
+import sssemil.com.bridge.net.stack.LoggerProtocol
+import sssemil.com.bridge.net.stack.network.Ipv6Protocol
+import sssemil.com.bridge.net.stack.transport.TcpProtocol
+import sssemil.com.bridge.net.stack.transport.UdpProtocol
 import java.io.File
 import java.lang.System.exit
 

@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack
+package sssemil.com.bridge.net.stack.transport
 
 import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.socket.EssClientHandle
+import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.util.Logger
-import sssemil.com.bridge.util.toHexString
+import sssemil.com.bridge.net.stack.Protocol
 
-class LoggerProtocol(scope: CoroutineScope, val tag: String? = null) : Protocol(scope) {
-
-    override fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        Logger.d(
-            "${tag
-                ?: "LOG"} from above, read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}"
-        )
-    }
+class UdpProtocol(scope: CoroutineScope) : Protocol(scope) {
 
     override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        Logger.d(
-            "${tag
-                ?: "LOG"} from below, read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}"
-        )
+        handle(buffer.sliceArray(offset until length))
+    }
+
+    private fun handle(packet: ByteArray) {
+        Logger.d("UdpProtocol: Not yet implemented!!!")
     }
 }

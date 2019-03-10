@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack
+package sssemil.com.bridge.net.stack
 
-import sssemil.com.bridge.socket.EssClientHandle
+import sssemil.com.bridge.ess.EssClientHandle
 
 class Layer(private vararg val protocols: Protocol) {
 

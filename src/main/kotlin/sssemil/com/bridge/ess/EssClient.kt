@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Emil Suleymanov
+ * Copyright 2019 Emil Suleymanov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack.exceptions
+package sssemil.com.bridge.ess
 
-class EmptyPacketException(message: String) : RuntimeException(message)
+import sssemil.com.socket.interfaces.PipeSocket
+import java.net.InetAddress
+
+data class EssClient(
+    val handle: EssClientHandle = EssClientHandle(),
+    val socket: PipeSocket,
+    val addresses: ArrayList<InetAddress> = arrayListOf(),
+    var mtu: UInt = 1500u
+)

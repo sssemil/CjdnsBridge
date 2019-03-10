@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.socket
+package sssemil.com.bridge.ess
 
 import kotlinx.coroutines.*
 import sssemil.com.bridge.util.Logger

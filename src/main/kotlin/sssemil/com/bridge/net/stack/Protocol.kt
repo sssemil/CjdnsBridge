@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack
+package sssemil.com.bridge.net.stack
 
 import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.socket.EssClientHandle
+import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.util.Logger
 
 abstract class Protocol(val scope: CoroutineScope) {

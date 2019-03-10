@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Emil Suleymanov
+ * Copyright 2019 Emil Suleymanov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack.network.structures
+package sssemil.com.bridge.net.structures
 
 import sssemil.com.bridge.util.toBytes
-import sssemil.com.net.stack.exceptions.EmptyPacketException
-import sssemil.com.net.stack.exceptions.InvalidTypeException
-import sssemil.com.net.util.number.Octet
-import sssemil.com.net.util.number.toOctet
+import sssemil.com.bridge.net.stack.exceptions.EmptyPacketException
+import sssemil.com.bridge.net.stack.exceptions.InvalidTypeException
+import sssemil.com.bridge.net.util.number.Octet
+import sssemil.com.bridge.net.util.number.toOctet
 import java.io.DataInputStream
 import java.net.Inet6Address
 import java.util.*

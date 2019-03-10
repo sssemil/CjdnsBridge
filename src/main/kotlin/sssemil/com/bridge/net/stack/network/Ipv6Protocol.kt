@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack.network
+package sssemil.com.bridge.net.stack.network
 
 import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.socket.EssClientHandle
+import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.util.Logger
-import sssemil.com.net.stack.Protocol
-import sssemil.com.net.stack.exceptions.EmptyPacketException
-import sssemil.com.net.stack.exceptions.InvalidTypeException
-import sssemil.com.net.stack.network.structures.Ipv6Packet
+import sssemil.com.bridge.net.stack.Protocol
+import sssemil.com.bridge.net.stack.exceptions.EmptyPacketException
+import sssemil.com.bridge.net.stack.exceptions.InvalidTypeException
+import sssemil.com.bridge.net.structures.Ipv6Packet
 
 class Ipv6Protocol(scope: CoroutineScope) : Protocol(scope) {
 

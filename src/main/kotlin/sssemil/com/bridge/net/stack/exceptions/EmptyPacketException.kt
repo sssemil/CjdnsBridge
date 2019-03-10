@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.socket
+package sssemil.com.bridge.net.stack.exceptions
 
-import kotlin.random.Random
-import kotlin.random.nextUInt
-
-data class EssClientHandle(val handle: UInt = Random.nextUInt())
+class EmptyPacketException(message: String) : RuntimeException(message)

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack.transport
+package sssemil.com.bridge.net.stack.transport
 
 import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.socket.EssClientHandle
+import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.util.Logger
-import sssemil.com.net.stack.Protocol
+import sssemil.com.bridge.net.stack.Protocol
 
 class TcpProtocol(scope: CoroutineScope) : Protocol(scope) {
 

@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack.transport
+package sssemil.com.bridge.net.stack.exceptions
 
-import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.socket.EssClientHandle
-import sssemil.com.bridge.util.Logger
-import sssemil.com.net.stack.Protocol
-
-class UdpProtocol(scope: CoroutineScope) : Protocol(scope) {
-
-    override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        handle(buffer.sliceArray(offset until length))
-    }
-
-    private fun handle(packet: ByteArray) {
-        Logger.d("UdpProtocol: Not yet implemented!!!")
-    }
-}
+class InvalidTypeException(message: String) : RuntimeException(message)
