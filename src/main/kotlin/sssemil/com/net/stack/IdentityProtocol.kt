@@ -17,6 +17,7 @@
 package sssemil.com.net.stack
 
 import kotlinx.coroutines.CoroutineScope
+import sssemil.com.bridge.socket.EssClientHandle
 
 class IdentityProtocol(
     scope: CoroutineScope,
@@ -24,13 +25,13 @@ class IdentityProtocol(
 ) :
     Protocol(scope) {
 
-    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) {
+    override fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
         function?.invoke(buffer, offset, length)
-        spitDown(buffer, offset, length)
+        spitDown(handle, buffer, offset, length)
     }
 
-    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
+    override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
         function?.invoke(buffer, offset, length)
-        spitUp(buffer, offset, length)
+        spitUp(handle, buffer, offset, length)
     }
 }

@@ -19,6 +19,7 @@ package sssemil.com.net.stack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import sssemil.com.bridge.socket.EssClientHandle
 import sssemil.com.net.stack.network.structures.Ipv6Packet
 import java.net.Inet6Address
 
@@ -33,8 +34,10 @@ class DummyLinkProtocol(scope: CoroutineScope, private val delayLength: Long = 1
                 hopLimit = 16
             ).build()
 
+            val handle = EssClientHandle()
+
             while (true) {
-                spitUp(serialized, 0, serialized.size)
+                spitUp(handle, serialized, 0, serialized.size)
                 delay(delayLength)
             }
         }

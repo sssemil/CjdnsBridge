@@ -17,19 +17,20 @@
 package sssemil.com.net.stack
 
 import kotlinx.coroutines.CoroutineScope
+import sssemil.com.bridge.socket.EssClientHandle
 import sssemil.com.bridge.util.Logger
 import sssemil.com.bridge.util.toHexString
 
 class LoggerProtocol(scope: CoroutineScope, val tag: String? = null) : Protocol(scope) {
 
-    override fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) {
+    override fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
         Logger.d(
             "${tag
                 ?: "LOG"} from above, read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}"
         )
     }
 
-    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
+    override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
         Logger.d(
             "${tag
                 ?: "LOG"} from below, read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}"

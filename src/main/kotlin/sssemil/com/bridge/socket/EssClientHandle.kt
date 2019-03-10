@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.interfaces
+package sssemil.com.bridge.socket
 
-import java.net.Inet6Address
+import kotlin.random.Random
+import kotlin.random.nextUInt
 
-interface ConfigurationCallback {
-
-    fun addAddress(inet6Address: Inet6Address)
-
-    fun setMtu(mtu: UInt)
-}
+data class EssClientHandle(val handle: UInt = Random.nextUInt())

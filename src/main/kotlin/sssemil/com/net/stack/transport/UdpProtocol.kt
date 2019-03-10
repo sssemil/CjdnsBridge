@@ -17,12 +17,13 @@
 package sssemil.com.net.stack.transport
 
 import kotlinx.coroutines.CoroutineScope
+import sssemil.com.bridge.socket.EssClientHandle
 import sssemil.com.bridge.util.Logger
 import sssemil.com.net.stack.Protocol
 
 class UdpProtocol(scope: CoroutineScope) : Protocol(scope) {
 
-    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
+    override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
         handle(buffer.sliceArray(offset until length))
     }
 

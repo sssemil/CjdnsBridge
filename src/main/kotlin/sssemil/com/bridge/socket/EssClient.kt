@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package sssemil.com.net.stack.transport
+package sssemil.com.bridge.socket
 
-import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.socket.EssClientHandle
-import sssemil.com.bridge.util.Logger
-import sssemil.com.net.stack.Protocol
+import sssemil.com.socket.interfaces.PipeSocket
+import java.net.InetAddress
 
-class TcpProtocol(scope: CoroutineScope) : Protocol(scope) {
-
-    override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        handle(buffer.sliceArray(offset until length))
-    }
-
-    private fun handle(packet: ByteArray) {
-        Logger.d("TcpProtocol: Not yet implemented!!!")
-    }
-}
+data class EssClient(
+    val handle: EssClientHandle = EssClientHandle(),
+    val socket: PipeSocket,
+    val addresses: ArrayList<InetAddress> = arrayListOf(),
+    var mtu: UInt = 1500u
+)

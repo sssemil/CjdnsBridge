@@ -17,7 +17,6 @@ package sssemil.com.bridge
 
 import kotlinx.coroutines.*
 import sssemil.com.bridge.cjdns.CjdnsProtocol
-import sssemil.com.bridge.interfaces.ConfigurationCallback
 import sssemil.com.bridge.util.Logger
 import sssemil.com.net.stack.Layer
 import sssemil.com.net.stack.LoggerProtocol
@@ -26,16 +25,6 @@ import sssemil.com.net.stack.transport.TcpProtocol
 import sssemil.com.net.stack.transport.UdpProtocol
 import java.io.File
 import java.lang.System.exit
-import java.net.Inet6Address
-
-val configurationCallback = object : ConfigurationCallback {
-
-    override fun addAddress(inet6Address: Inet6Address) {
-    }
-
-    override fun setMtu(mtu: UInt) {
-    }
-}
 
 val job = SupervisorJob()
 val scope = CoroutineScope(Dispatchers.Default + job)
@@ -60,7 +49,7 @@ fun main(args: Array<String>) = runBlocking {
 suspend fun exec(socket: File) {
     val layers = ArrayList<Layer>()
     try {
-        val linkLayer = Layer(CjdnsProtocol(scope, socket.absolutePath, configurationCallback))
+        val linkLayer = Layer(CjdnsProtocol(scope, socket.absolutePath))
         val networkLayer = Layer(LoggerProtocol(scope, "NET"), Ipv6Protocol(scope))
         val transportLayer = Layer(LoggerProtocol(scope, "TRN"), TcpProtocol(scope), UdpProtocol(scope))
 

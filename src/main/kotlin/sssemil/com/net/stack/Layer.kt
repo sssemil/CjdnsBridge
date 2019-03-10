@@ -16,6 +16,8 @@
 
 package sssemil.com.net.stack
 
+import sssemil.com.bridge.socket.EssClientHandle
+
 class Layer(private vararg val protocols: Protocol) {
 
     private var upperLayer: Layer? = null
@@ -34,19 +36,19 @@ class Layer(private vararg val protocols: Protocol) {
         upperLayer.lowerLayer = this
     }
 
-    private fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
-        protocols.forEach { it.swallowFromBelow(buffer, offset, length) }
+    private fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
+        protocols.forEach { it.swallowFromBelow(handle, buffer, offset, length) }
     }
 
-    private fun swallowFromAbove(buffer: ByteArray, offset: Int, length: Int) {
-        protocols.forEach { it.swallowFromAbove(buffer, offset, length) }
+    private fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
+        protocols.forEach { it.swallowFromAbove(handle, buffer, offset, length) }
     }
 
-    fun spitUp(buffer: ByteArray, offset: Int, length: Int) {
-        upperLayer?.swallowFromBelow(buffer, offset, length)
+    fun spitUp(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
+        upperLayer?.swallowFromBelow(handle, buffer, offset, length)
     }
 
-    fun spitDown(buffer: ByteArray, offset: Int, length: Int) {
-        lowerLayer?.swallowFromAbove(buffer, offset, length)
+    fun spitDown(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
+        lowerLayer?.swallowFromAbove(handle, buffer, offset, length)
     }
 }

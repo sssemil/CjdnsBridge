@@ -16,22 +16,71 @@
 
 package sssemil.com.socket.interfaces
 
+import sssemil.com.bridge.util.Logger
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
-interface PipeSocket {
+abstract class PipeSocket {
 
-    val inputStream: InputStream?
+    abstract val inputStream: InputStream?
 
-    val outputStream: OutputStream?
+    abstract val outputStream: OutputStream?
 
-    @Throws(IOException::class)
-    fun close()
-
-    @Throws(IOException::class)
-    fun shutdownInput()
+    private val socketLock = Object()
 
     @Throws(IOException::class)
-    fun shutdownOutput()
+    abstract fun close()
+
+    @Throws(IOException::class)
+    abstract fun shutdownInput()
+
+    @Throws(IOException::class)
+    abstract fun shutdownOutput()
+
+    /**
+     * Close current socket.
+     */
+    fun closeClient() {
+        synchronized(socketLock) {
+            close()
+        }
+    }
+
+    /**
+     * Write to the socket.
+     *
+     * @param buffer A buffer containing the packet.
+     * @param length the first size bytes will be sent.
+     *
+     * @return Whether or not there was a client to write to.
+     */
+    fun write(buffer: ByteArray, offset: Int, length: Int): Boolean {
+        synchronized(socketLock) {
+            outputStream?.write(buffer, offset, length) ?: run {
+                Logger.w("There is no valid client yet!")
+                return false
+            }
+
+            return true
+        }
+    }
+
+    /**
+     * Read from the socket.
+     *
+     * @param buffer The buffer to read into.
+     *
+     * @return The number of bytes read.
+     */
+    fun read(buffer: ByteArray): Int {
+        synchronized(socketLock) {
+            inputStream?.let {
+                return it.read(buffer)
+            } ?: run {
+                Logger.w("There is no valid client yet!")
+                return -1
+            }
+        }
+    }
 }

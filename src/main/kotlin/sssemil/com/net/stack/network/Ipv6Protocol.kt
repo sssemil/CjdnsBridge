@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Emil Suleymanov
+ * Copyright 2019 Emil Suleymanov
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package sssemil.com.net.stack.network
 
 import kotlinx.coroutines.CoroutineScope
+import sssemil.com.bridge.socket.EssClientHandle
 import sssemil.com.bridge.util.Logger
 import sssemil.com.net.stack.Protocol
 import sssemil.com.net.stack.exceptions.EmptyPacketException
@@ -25,11 +26,11 @@ import sssemil.com.net.stack.network.structures.Ipv6Packet
 
 class Ipv6Protocol(scope: CoroutineScope) : Protocol(scope) {
 
-    override fun swallowFromBelow(buffer: ByteArray, offset: Int, length: Int) {
-        handle(buffer.sliceArray(offset until length))
+    override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
+        handle(handle, buffer.sliceArray(offset until length))
     }
 
-    private fun handle(packet: ByteArray) {
+    private fun handle(handle: EssClientHandle, packet: ByteArray) {
         try {
             val ipv6Packet = Ipv6Packet.parse(packet)
 
