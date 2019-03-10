@@ -24,92 +24,56 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object Logger {
-    private const val DEBUG = true
+
+    var loggingLevel = Level.Verbose
+    var writeLogsToFile = false
 
     private const val logFileName = "bridge.log"
 
-    private var logOut = PrintWriter(File(logFileName))
     private val logLock = Object()
-
-    var writeLogsToFile = false
+    private var logOut = PrintWriter(File(logFileName))
 
     fun d(msg: String) {
-        if (DEBUG) {
-            val msgWithInfo = "[D][${getTag()}][${getDateString()}]: $msg"
+        write(Logger.Level.Debug, msg)
+    }
 
-            System.out.println(msgWithInfo)
+    fun i(msg: String) {
+        write(Logger.Level.Info, msg)
+    }
+
+    fun w(msg: String) {
+        write(Logger.Level.Warn, msg)
+    }
+
+    fun e(msg: String, tr: Throwable? = null) {
+        write(Logger.Level.Error, msg, tr)
+    }
+
+    private fun write(level: Level, msg: String? = null, tr: Throwable? = null) {
+        if (loggingLevel.value >= level.value) {
+            var msgWithInfo = "[${getDateString()}][${level.mark}][${getCallerClassName()}]: $msg"
+
+            tr?.let {
+                msgWithInfo += "${tr.message}"
+            }
+
+            (if (level == Logger.Level.Error) System.err else System.out).println(msgWithInfo)
+            tr?.printStackTrace()
 
             if (writeLogsToFile) {
                 synchronized(logLock) {
                     logOut.println(msgWithInfo)
+                    tr?.printStackTrace(logOut)
                     logOut.flush()
                 }
             }
         }
     }
 
-    fun i(msg: String) {
-        val msgWithInfo = "[I][${getTag()}][${getDateString()}]: $msg"
-
-        System.out.println(msgWithInfo)
-
-        if (writeLogsToFile) {
-            synchronized(logLock) {
-                logOut.println(msgWithInfo)
-                logOut.flush()
-            }
-        }
-    }
-
-    fun w(msg: String) {
-        val msgWithInfo = "[W][${getTag()}][${getDateString()}]: $msg"
-
-        System.out.println(msgWithInfo)
-
-        if (writeLogsToFile) {
-            synchronized(logLock) {
-                logOut.println(msgWithInfo)
-                logOut.flush()
-            }
-        }
-    }
-
-    fun e(msg: String, e: Throwable? = null) {
-        var msgWithInfo = "[E][${getTag()}][${getDateString()}]: $msg"
-
-        e?.let {
-            msgWithInfo += "${e.message}"
-        }
-
-        System.err.println(msgWithInfo)
-        e?.printStackTrace()
-
-        if (writeLogsToFile) {
-            synchronized(logLock) {
-                logOut.println(msgWithInfo)
-                e?.printStackTrace(logOut)
-                logOut.flush()
-            }
-        }
-        //throw RuntimeException(msgWithInfo)
-    }
-
     private fun getDateString(): String {
         val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
         return dateFormat.format(calendar.time)
-    }
-
-    fun getTimeString(deltaTime: Long = System.currentTimeMillis()): String {
-        var holder = deltaTime
-        val second = holder / 1000 % 60
-        holder -= second * 1000
-        val minute = holder / (1000 * 60) % 60
-        holder -= minute * 1000 * 60
-        val hour = holder / (1000 * 60 * 60) % 24
-        holder -= hour * 1000 * 60 * 24
-
-        return String.format("%02dh:%02dm:%02ds:%04dms", hour, minute, second, holder)
     }
 
     fun setOutputDirectory(rootFolder: File) {
@@ -119,26 +83,13 @@ object Logger {
     }
 
     /**
-     * This function wil give you a tag based on build type.
-     *
-     * @return tag for logging.
-     */
-    private fun getTag(): String {
-        return if (DEBUG) {
-            getCaller()?.let {
-                return@let it.className?.substringAfterLast(".") + "#" + it.methodName
-            }
-        } else {
-            getCallerClassName()
-        } ?: ""
-    }
-
-    /**
-     * Gives caller class name. Based on this : https://stackoverflow.com/a/11306854/3119031
+     * Gives caller class name with line number and function name. Based on this : https://stackoverflow.com/a/11306854/3119031
      *
      * @return Caller class name
      */
-    private fun getCallerClassName() = getCaller()?.className?.substringAfterLast(".")
+    private fun getCallerClassName() = getCaller()?.let {
+        it.className + "(" + it.fileName + ":" + it.lineNumber + ")"
+    } ?: "#"
 
     /**
      * Gives caller. Based on this : https://stackoverflow.com/a/11306854/3119031
@@ -149,5 +100,14 @@ object Logger {
         it.className != Logger::class.java.name
                 && it.className != Thread::class.java.name
                 && it.className != "dalvik.system.VMStack"
+    }
+
+    enum class Level(val value: Int, val mark: String) {
+        Off(0, "-"),
+        Error(1, "E"),
+        Warn(2, "W"),
+        Info(3, "I"),
+        Debug(4, "D"),
+        Verbose(5, "V")
     }
 }
