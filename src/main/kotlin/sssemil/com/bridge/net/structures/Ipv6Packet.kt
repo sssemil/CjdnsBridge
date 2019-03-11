@@ -16,19 +16,19 @@
 
 package sssemil.com.bridge.net.structures
 
-import sssemil.com.bridge.util.toBytes
 import sssemil.com.bridge.net.stack.exceptions.EmptyPacketException
 import sssemil.com.bridge.net.stack.exceptions.InvalidTypeException
-import sssemil.com.bridge.net.util.number.Octet
-import sssemil.com.bridge.net.util.number.toOctet
+import sssemil.com.bridge.net.util.number.Nibble
+import sssemil.com.bridge.net.util.number.toNibble
+import sssemil.com.bridge.util.toBytes
 import java.io.DataInputStream
 import java.net.Inet6Address
 import java.util.*
 
 data class Ipv6Packet(
-    val version: Octet = IPV6,
+    val version: Nibble = IPV6,
     val trafficClass: Byte = 0,
-    val flowLabel: Array<Octet> = Array(5) { 0.toOctet() },
+    val flowLabel: Array<Nibble> = Array(5) { 0.toNibble() },
     var payloadLength: Short = 0,
     val nextHeader: Byte = UDP,
     val hopLimit: Byte,
@@ -73,7 +73,7 @@ data class Ipv6Packet(
                 throw EmptyPacketException("Can't process an empty packet!")
             }
 
-            val version = read().shr(4).toOctet()
+            val version = read().shr(4).toNibble()
 
             if (version != IPV6) {
                 throw InvalidTypeException("Can't parse not IPv6 packets!")
@@ -119,7 +119,7 @@ data class Ipv6Packet(
             )
         }
 
-        val IPV6: Octet = 6.toOctet()
+        val IPV6: Nibble = 6.toNibble()
 
         const val UDP = 0x11.toByte()
         const val IPV6_ICMP = 0x3A.toByte()

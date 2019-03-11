@@ -16,12 +16,12 @@
 
 package sssemil.com.bridge.net.util.number
 
-class Octet(byte: Byte) : Number() {
+class Nibble(byte: Byte) : Number() {
 
     private var value: Byte = 0
 
     init {
-        value = byte.toInt().shl(4).shr(4).toByte()
+        value = byte.toInt().shl(SIZE_BITS).shr(SIZE_BITS).toByte()
     }
 
     override fun toByte() = value
@@ -37,11 +37,12 @@ class Octet(byte: Byte) : Number() {
     override fun toLong() = value.toLong()
 
     override fun toShort() = value.toShort()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Octet
+        other as Nibble
 
         if (value != other.value) return false
 
@@ -55,6 +56,24 @@ class Octet(byte: Byte) : Number() {
     override fun toString(): String {
         return value.toString()
     }
+
+    companion object {
+
+        /**
+         * A constant holding the minimum value an instance of Nibble can have.
+         */
+        val MIN_VALUE = Nibble(-8)
+
+        /**
+         * A constant holding the maximum value an instance of Nibble can have.
+         */
+        val MAX_VALUE = Nibble(7)
+
+        /**
+         * The number of bits used to represent an instance of Nibble in a binary form.
+         */
+        const val SIZE_BITS = 4
+    }
 }
 
-fun Number.toOctet() = Octet(toByte())
+fun Number.toNibble() = Nibble(toByte())
