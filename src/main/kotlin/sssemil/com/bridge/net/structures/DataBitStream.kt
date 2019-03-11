@@ -17,7 +17,6 @@
 package sssemil.com.bridge.net.structures
 
 import java.util.*
-import kotlin.experimental.or
 
 class DataBitStream(private val bits: BitSet, private var offset: Int, private var length: Int) {
 
@@ -30,22 +29,31 @@ class DataBitStream(private val bits: BitSet, private var offset: Int, private v
     fun takeBit() = if (length - offset - 1 < 0) throw InsufficientBitsException(offset, length, 1)
     else bits.get(offset++)
 
-    fun takeByte(): Byte {
-        var result: Byte = 0
-        if (length - offset - Byte.SIZE_BITS < 0) throw InsufficientBitsException(offset, length, Byte.SIZE_BITS)
-        for (i in offset until offset + Byte.SIZE_BITS) {
-            if (bits.get(i)) {
-                result = result or (1 shl i % Byte.SIZE_BITS).toByte()
-            }
-        }
-        offset += Byte.SIZE_BITS
-        return result
-    }
+    fun takeByte() = takePrimitive<Byte>(Byte.SIZE_BITS)
+
+    fun takeShort() = takePrimitive<Short>(Short.SIZE_BITS)
+
+    fun takeInt() = takePrimitive<Int>(Int.SIZE_BITS)
+
+    fun takeLong() = takePrimitive<Long>(Long.SIZE_BITS)
 
     fun takeBits(n: Int): BitSet {
         val result = if (length - offset - n < 0) throw InsufficientBitsException(offset, length, n)
         else bits.get(offset, offset + n)
         offset += n
         return result
+    }
+
+    fun <T : Number> takePrimitive(sizeBits: Int): T {
+        var result = 0
+        if (length - offset - sizeBits < 0) throw InsufficientBitsException(offset, length, sizeBits)
+        for (i in offset until offset + sizeBits) {
+            if (bits.get(i)) {
+                result = result or (1 shl i % sizeBits)
+            }
+        }
+
+        offset += sizeBits
+        return result as T
     }
 }
