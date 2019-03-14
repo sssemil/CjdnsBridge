@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
 
@@ -59,6 +61,8 @@ compileTestKotlin {
 
 sourceSets {
     main.kotlin.srcDirs += 'src/main/kotlin'
+    main.kotlin.srcDirs += 'src/main/java'
+    main.kotlin.srcDirs += 'src/main/gen-java'
 }
 
 test {
