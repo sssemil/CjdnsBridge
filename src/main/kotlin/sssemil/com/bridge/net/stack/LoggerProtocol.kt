@@ -17,23 +17,17 @@
 package sssemil.com.bridge.net.stack
 
 import kotlinx.coroutines.CoroutineScope
+import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.util.Logger
-import sssemil.com.bridge.util.toHexString
 
 class LoggerProtocol(scope: CoroutineScope, val tag: String? = null) : Protocol(scope) {
 
-    override fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        Logger.d(
-            "${tag
-                ?: "LOG"} from above, read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}"
-        )
+    override fun swallowFromAbove(handle: EssClientHandle, packet: IPacket) {
+        Logger.d("${tag ?: "LOG"} from above: $packet")
     }
 
-    override fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        Logger.d(
-            "${tag
-                ?: "LOG"} from below, read count: ${length - offset}, packet: ${buffer.sliceArray(offset until length).toHexString()}"
-        )
+    override fun swallowFromBelow(handle: EssClientHandle, packet: IPacket) {
+        Logger.d("${tag ?: "LOG"} from below: $packet")
     }
 }

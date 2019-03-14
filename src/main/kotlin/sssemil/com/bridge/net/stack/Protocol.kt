@@ -17,6 +17,7 @@
 package sssemil.com.bridge.net.stack
 
 import kotlinx.coroutines.CoroutineScope
+import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.util.Logger
 
@@ -31,15 +32,15 @@ abstract class Protocol(val scope: CoroutineScope) {
     /**
      * Takes from the lower level.
      */
-    open fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
+    open fun swallowFromBelow(handle: EssClientHandle, packet: IPacket) {
         // not implemented
     }
 
     /**
      * Sends to the upper level.
      */
-    open fun spitUp(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        layer?.spitUp(handle, buffer, offset, length) ?: run {
+    open fun spitUp(handle: EssClientHandle, packet: IPacket) {
+        layer?.spitUp(handle, packet) ?: run {
             Logger.w("No upper layer set! Data will be lost.")
         }
     }
@@ -47,15 +48,15 @@ abstract class Protocol(val scope: CoroutineScope) {
     /**
      * Takes from the upper level.
      */
-    open fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
+    open fun swallowFromAbove(handle: EssClientHandle, packet: IPacket) {
         // not implemented
     }
 
     /**
      * Sends to the lower level.
      */
-    open fun spitDown(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        layer?.spitDown(handle, buffer, offset, length) ?: run {
+    open fun spitDown(handle: EssClientHandle, packet: IPacket) {
+        layer?.spitDown(handle, packet) ?: run {
             Logger.w("No lower layer set! Data will be lost.")
         }
     }

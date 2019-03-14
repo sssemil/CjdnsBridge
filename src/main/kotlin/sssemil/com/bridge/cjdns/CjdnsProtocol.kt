@@ -17,9 +17,11 @@
 package sssemil.com.bridge.cjdns
 
 import kotlinx.coroutines.CoroutineScope
+import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.ess.EssSocket
 import sssemil.com.bridge.net.stack.Protocol
+import sssemil.com.bridge.net.structures.EssPacket
 
 /**
  * This layer spits IPv6 packets from cjdns.
@@ -44,15 +46,17 @@ class CjdnsProtocol(
 
     private val callback: EssSocket.Callback = object : EssSocket.Callback {
 
-        override fun onNetworkPacket(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-            spitUp(handle, buffer, offset, length)
+        override fun onPacket(packet: EssPacket) {
+            //TODO: Use proper handle.
+            spitUp(EssClientHandle(), packet.frame)
         }
     }
 
     private val cjdnsSocket = EssSocket(scope, path, callback)
 
-    override fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        cjdnsSocket.clients[handle]?.socket?.write(buffer, offset, length)
+    override fun swallowFromAbove(handle: EssClientHandle, packet: IPacket) {
+        val buffer = packet.serialize()
+        cjdnsSocket.clients[handle]?.socket?.write(buffer, 0, buffer.size)
     }
 
     override suspend fun kill() {

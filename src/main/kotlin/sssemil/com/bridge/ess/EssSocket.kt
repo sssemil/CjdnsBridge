@@ -17,11 +17,10 @@
 package sssemil.com.bridge.ess
 
 import kotlinx.coroutines.*
+import sssemil.com.bridge.net.structures.DataBitStream
+import sssemil.com.bridge.net.structures.EssPacket
 import sssemil.com.bridge.util.Logger
 import sssemil.com.socket.SocketHelper
-import java.net.Inet6Address
-import java.net.UnknownHostException
-import java.nio.BufferUnderflowException
 import java.util.concurrent.atomic.AtomicBoolean
 
 class EssSocket(
@@ -45,7 +44,7 @@ class EssSocket(
                             val client = EssClient(socket = it)
                             Logger.d("Accepted client socket: $client")
                             clients[client.handle] = client
-                            onAcceptSocket(client)
+                            onAcceptClient(client)
                         }
                     }
                 }
@@ -53,59 +52,28 @@ class EssSocket(
         }
     }
 
-    private fun onAcceptSocket(client: EssClient) {
-        val buffer = ByteArray(BUFFER_SIZE)
+    private fun onAcceptClient(client: EssClient) {
+        var bufferSize: Int = BUFFER_SIZE
+        var buffer = ByteArray(bufferSize)
         var readCount: Int
-        var position = 0
 
         do {
             readCount = client.socket.read(buffer)
 
             if (readCount < 1) continue
 
-            while (position < readCount) {
-                when (buffer[position++]) {
-                    TYPE_TUN_PACKET -> {
-                        Logger.d("TUN_PACKET")
-                        //TODO: pass down PI data
-                        position += NO_PI_OFFSET
+            val data = DataBitStream(buffer, 0, readCount)
 
-                        callback.onNetworkPacket(client.handle, buffer, position, readCount)
-                        position = readCount
-                    }
-                    TYPE_CONF_ADD_IPV6_ADDRESS -> {
-                        try {
-                            if (readCount - position >= IPV6_ADDR_LENGTH) {
-                                val ipv6 = Inet6Address.getByAddress(
-                                    buffer.sliceArray(position until position + IPV6_ADDR_LENGTH)
-                                ) as Inet6Address
-                                position += IPV6_ADDR_LENGTH
-                                Logger.d("CONF_ADD_IPV6_ADDRESS: ${ipv6.hostAddress}")
-                                client.addresses.add(ipv6)
-                            } else {
-                                Logger.e("Invalid size for an IPv6 address!")
-                            }
-                        } catch (e: UnknownHostException) {
-                            Logger.e("Couldn't parse IPv6 address!", e)
-                        }
-                    }
-                    TYPE_CONF_SET_MTU -> {
-                        try {
-                            val mtu = byteArrayToInt(buffer, position).toUInt()
-                            position += 4
-                            Logger.d("CONF_SET_MTU: $mtu")
-                            client.mtu = mtu
-                        } catch (e: BufferUnderflowException) {
-                            Logger.e("Too short for a valid MTU!", e)
-                        }
-                    }
-                    else -> {
-                        Logger.w("Unknown packet type: ${buffer[0]}")
-                        position = readCount
-                    }
+            while (!data.isEmpty()) {
+                EssPacket.parse(client, data)?.let {
+                    callback.onPacket(it)
                 }
             }
-            position = 0
+
+            if (client.mtu.toInt() != bufferSize) {
+                bufferSize = client.mtu.toInt()
+                buffer = ByteArray(bufferSize)
+            }
         } while (readCount != -1)
 
         client.socket.closeClient()
@@ -122,25 +90,11 @@ class EssSocket(
 
     interface Callback {
 
-        fun onNetworkPacket(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int)
+        fun onPacket(packet: EssPacket)
     }
 
     companion object {
 
         const val BUFFER_SIZE = 2048
-        const val NO_PI_OFFSET = 4
-
-        const val IPV6_ADDR_LENGTH = 16
-
-        const val TYPE_TUN_PACKET: Byte = 0
-        const val TYPE_CONF_ADD_IPV6_ADDRESS: Byte = 1
-        const val TYPE_CONF_SET_MTU: Byte = 2
-
-        fun byteArrayToInt(bytes: ByteArray, offset: Int = 0): Int {
-            return (bytes[offset + 3].toInt() and 0xFF or (
-                    bytes[offset + 2].toInt() and 0xFF shl 8) or (
-                    bytes[offset + 1].toInt() and 0xFF shl 16) or (
-                    bytes[offset + 0].toInt() and 0xFF shl 24))
-        }
     }
 }

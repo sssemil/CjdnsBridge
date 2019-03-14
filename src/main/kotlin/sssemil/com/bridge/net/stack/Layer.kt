@@ -16,10 +16,13 @@
 
 package sssemil.com.bridge.net.stack
 
+import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
+import sssemil.com.bridge.util.Logger
 
-class Layer(private vararg val protocols: Protocol) {
+class Layer {
 
+    private val protocols = arrayListOf<Protocol>()
     private var upperLayer: Layer? = null
     private var lowerLayer: Layer? = null
 
@@ -36,19 +39,28 @@ class Layer(private vararg val protocols: Protocol) {
         upperLayer.lowerLayer = this
     }
 
-    private fun swallowFromBelow(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        protocols.forEach { it.swallowFromBelow(handle, buffer, offset, length) }
+    private fun swallowFromBelow(handle: EssClientHandle, packet: IPacket) {
+        protocols.forEach { it.swallowFromBelow(handle, packet) }
     }
 
-    private fun swallowFromAbove(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        protocols.forEach { it.swallowFromAbove(handle, buffer, offset, length) }
+    private fun swallowFromAbove(handle: EssClientHandle, packet: IPacket) {
+        protocols.forEach { it.swallowFromAbove(handle, packet) }
     }
 
-    fun spitUp(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        upperLayer?.swallowFromBelow(handle, buffer, offset, length)
+    fun spitUp(handle: EssClientHandle, packet: IPacket) {
+        upperLayer?.swallowFromBelow(handle, packet)
     }
 
-    fun spitDown(handle: EssClientHandle, buffer: ByteArray, offset: Int, length: Int) {
-        lowerLayer?.swallowFromAbove(handle, buffer, offset, length)
+    fun spitDown(handle: EssClientHandle, packet: IPacket) {
+        lowerLayer?.swallowFromAbove(handle, packet)
+    }
+
+    fun registerProtocol(protocol: Protocol) {
+        if (protocol.layer == null) {
+            protocols.add(protocol)
+            protocol.layer = this
+        } else {
+            Logger.e("Already registered in a layer!")
+        }
     }
 }

@@ -18,12 +18,9 @@ package sssemil.com.bridge
 
 import kotlinx.coroutines.*
 import sssemil.com.bridge.cjdns.CjdnsProtocol
-import sssemil.com.bridge.util.Logger
 import sssemil.com.bridge.net.stack.Layer
 import sssemil.com.bridge.net.stack.LoggerProtocol
-import sssemil.com.bridge.net.stack.network.Ipv6Protocol
-import sssemil.com.bridge.net.stack.transport.TcpProtocol
-import sssemil.com.bridge.net.stack.transport.UdpProtocol
+import sssemil.com.bridge.util.Logger
 import java.io.File
 import java.lang.System.exit
 
@@ -50,13 +47,15 @@ fun main(args: Array<String>) = runBlocking {
 suspend fun exec(socket: File) {
     val layers = ArrayList<Layer>()
     try {
-        val linkLayer = Layer(CjdnsProtocol(scope, socket.absolutePath))
-        val networkLayer = Layer(LoggerProtocol(scope, "NET"), Ipv6Protocol(scope))
-        val transportLayer = Layer(LoggerProtocol(scope, "TRN"), TcpProtocol(scope), UdpProtocol(scope))
+        val linkLayer = Layer().also {
+            it.registerProtocol(CjdnsProtocol(scope, socket.absolutePath))
+        }
+        val networkLayer = Layer().also {
+            it.registerProtocol(LoggerProtocol(scope, "NET"))
+        }
 
         layers.add(linkLayer)
         layers.add(networkLayer)
-        layers.add(transportLayer)
 
         for (i in 0 until layers.size - 1) {
             layers[i].bind(layers[i + 1])
