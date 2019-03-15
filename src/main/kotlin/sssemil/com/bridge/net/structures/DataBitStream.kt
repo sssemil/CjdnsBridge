@@ -76,5 +76,5 @@ class DataBitStream(private val bits: BitSet, private var offset: Int, private v
 
     fun isEmpty() = offset >= length
 
-    fun remainingBits() = length - offset - 1
+    fun remainingBits() = length - offset
 }
