@@ -38,11 +38,11 @@ data class EssPacket(val flags: Short, val proto: Short, val frame: IPacket) {
             data.takeByte().let { type ->
                 when (type) {
                     TYPE_TUN_PACKET -> {
-                        Logger.d("TUN_PACKET")
-
-                        val length = data.takeUInt()
+                        val length = data.takeUInt() - 4u
                         val flags = data.takeShort()
                         val proto = data.takeShort()
+
+                        Logger.d("TUN_PACKET: [length: $length, flags: $flags, proto: $proto](${data.remainingBits() / 8})")
 
                         val frameData = data.takeByteArray(Math.min(data.remainingBits() / 8, length.toLong().toInt()))
                         return EssPacket(flags, proto, IPv6().deserialize(frameData, 0, frameData.size))
