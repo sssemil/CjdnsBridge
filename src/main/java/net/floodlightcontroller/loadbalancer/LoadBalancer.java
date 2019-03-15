@@ -812,9 +812,7 @@ ILoadBalancerService, IOFMessageListener {
 							.setPayload(new ICMP()
 									.setIcmpCode((byte) 0)
 									.setIcmpType((byte) 8)
-									.setPayload(new Data()
-											.setData(icmp_data_byte)								
-											)));
+									.setPayload(new Data(icmp_data_byte))));
 
 			FloodlightContext cntx = null;
 			pushPacket(icmpRequest, theSW, OFBufferId.NO_BUFFER, OFPort.CONTROLLER, npt.getPortId(), cntx, true);
