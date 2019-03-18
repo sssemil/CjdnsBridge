@@ -1,5 +1,6 @@
 /*
  * Copyright 2019 Emil Suleymanov
+ * Copyright 2013, Big Switch Networks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +15,6 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.net.stack
+package sssemil.com.bridge.packet
 
-import kotlinx.coroutines.CoroutineScope
-import sssemil.com.bridge.ess.EssClientHandle
-import sssemil.com.bridge.packet.IPacket
-import sssemil.com.bridge.util.Logger
-
-class LoggerProtocol(scope: CoroutineScope, val tag: String? = null) : Protocol(scope) {
-
-    override fun swallowFromAbove(handle: EssClientHandle, packet: IPacket) {
-        Logger.d("${tag ?: "LOG"} from above: $packet")
-    }
-
-    override fun swallowFromBelow(handle: EssClientHandle, packet: IPacket) {
-        Logger.d("${tag ?: "LOG"} from below: $packet")
-    }
-}
+class PacketParsingException(msg: String) : Exception(msg)

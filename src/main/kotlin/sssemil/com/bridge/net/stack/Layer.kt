@@ -16,8 +16,8 @@
 
 package sssemil.com.bridge.net.stack
 
-import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
+import sssemil.com.bridge.packet.IPacket
 import sssemil.com.bridge.util.Logger
 
 class Layer {

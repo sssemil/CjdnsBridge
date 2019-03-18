@@ -17,11 +17,11 @@
 package sssemil.com.bridge.cjdns
 
 import kotlinx.coroutines.CoroutineScope
-import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.ess.EssSocket
 import sssemil.com.bridge.net.stack.Protocol
 import sssemil.com.bridge.net.structures.TunPacket
+import sssemil.com.bridge.packet.IPacket
 
 /**
  * This layer spits IPv6 packets from cjdns.

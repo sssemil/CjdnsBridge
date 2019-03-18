@@ -16,7 +16,7 @@
 
 package sssemil.com.bridge.net.structures
 
-import net.floodlightcontroller.packet.IPv6
+import sssemil.com.bridge.packet.IPv6
 import sssemil.com.bridge.util.Logger
 import java.net.Inet6Address
 import java.net.UnknownHostException

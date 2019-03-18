@@ -16,6 +16,6 @@
 
 package sssemil.com.bridge.net.structures
 
-import net.floodlightcontroller.packet.IPacket
+import sssemil.com.bridge.packet.IPacket
 
 data class TunPacket(val flags: Short, val proto: Short, val frame: IPacket) : IEssPacketPayload

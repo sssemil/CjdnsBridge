@@ -17,8 +17,8 @@
 package sssemil.com.bridge.net.stack
 
 import kotlinx.coroutines.CoroutineScope
-import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
+import sssemil.com.bridge.packet.IPacket
 import sssemil.com.bridge.util.Logger
 
 abstract class Protocol(val scope: CoroutineScope) {
