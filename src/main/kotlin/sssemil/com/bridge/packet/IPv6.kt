@@ -153,6 +153,7 @@ data class IPv6(
 
         init {
             // TODO: Add ICMPv6, IPv6 Options, etc..
+            nextHeaderClassMap[IpProtocol.IPv6_ICMP] = { ICMPv6() }
             nextHeaderClassMap[IpProtocol.TCP] = { TCP() }
             nextHeaderClassMap[IpProtocol.UDP] = { UDP() }
         }
