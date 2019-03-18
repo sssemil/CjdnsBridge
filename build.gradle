@@ -63,6 +63,7 @@ sourceSets {
     main.kotlin.srcDirs += 'src/main/kotlin'
     main.kotlin.srcDirs += 'src/main/java'
     main.kotlin.srcDirs += 'src/main/gen-java'
+    main.kotlin.srcDirs += 'src/main/floodlight-java'
 }
 
 test {
