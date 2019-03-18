@@ -26,18 +26,7 @@ import sssemil.com.bridge.net.structures.EssPacket
 /**
  * This layer spits IPv6 packets from cjdns.
  *
- * -------------------------------------------------------
- * | Flags (2 bytes) | Proto (2 bytes) | Raw IPv6 packet |
- * -------------------------------------------------------
- *
- * If you don't need packet information, set noPi to true. They you'll get:
- *
- * -------------------
- * | Raw IPv6 packet |
- * -------------------
- *
  * @param path Path to cjdns socket.
- * @param noPi Set to true, to only get raw IP packet.
  */
 class CjdnsProtocol(
     scope: CoroutineScope,
