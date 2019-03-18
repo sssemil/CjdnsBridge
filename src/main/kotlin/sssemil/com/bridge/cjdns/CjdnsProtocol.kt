@@ -22,6 +22,7 @@ import sssemil.com.bridge.ess.EssSocket
 import sssemil.com.bridge.net.stack.Protocol
 import sssemil.com.bridge.net.structures.TunPacket
 import sssemil.com.bridge.packet.IPacket
+import sssemil.com.bridge.util.Logger
 
 /**
  * This layer spits IPv6 packets from cjdns.
@@ -35,17 +36,19 @@ class CjdnsProtocol(
 
     private val callback: EssSocket.Callback = object : EssSocket.Callback {
 
-        override fun onPacket(packet: TunPacket) {
-            //TODO: Use proper handle.
-            spitUp(EssClientHandle(), packet.frame)
+        override fun onPacket(handle: EssClientHandle, packet: TunPacket) {
+            packet.frame?.let { spitUp(handle, it) }
         }
     }
 
     private val cjdnsSocket = EssSocket(scope, path, callback)
 
     override fun swallowFromAbove(handle: EssClientHandle, packet: IPacket) {
-        val buffer = packet.serialize()
-        cjdnsSocket.clients[handle]?.socket?.write(buffer, 0, buffer.size)
+        Logger.d("CJDNS: from above: $packet")
+        val tunPacket = TunPacket(frame = packet)
+        val buffer = tunPacket.serialize()
+        val client = cjdnsSocket.clients[handle]
+        client?.socket?.write(buffer, 0, buffer.size)
     }
 
     override suspend fun kill() {

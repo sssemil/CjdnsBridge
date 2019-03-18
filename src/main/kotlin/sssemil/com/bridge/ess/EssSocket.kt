@@ -67,7 +67,7 @@ class EssSocket(
                 EssPacket.parse(data)?.let {
                     when (it.type) {
                         EssPacket.TYPE_TUN_PACKET -> {
-                            callback.onPacket(it.payload as TunPacket)
+                            callback.onPacket(client.handle, it.payload as TunPacket)
                         }
                         EssPacket.TYPE_CONF_ADD_IPV6_ADDRESS -> {
                             client.addresses.add((it.payload as EssAddIpv6AddressPayload).inet6Address)
@@ -102,7 +102,7 @@ class EssSocket(
 
     interface Callback {
 
-        fun onPacket(packet: TunPacket)
+        fun onPacket(handle: EssClientHandle, packet: TunPacket)
     }
 
     companion object {

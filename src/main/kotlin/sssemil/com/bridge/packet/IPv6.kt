@@ -62,7 +62,7 @@ data class IPv6(
                 var found = false
                 val entries = IPv6.nextHeaderClassMap.entries
                 for ((key, value) in entries) {
-                    if (value == payload.javaClass) {
+                    if (value().javaClass == payload.javaClass) {
                         found = true
                         nextHeader = key
                         Logger.w("Setting previously unset IPv6 'next header' to $key as detected by payload ${payload.javaClass}")

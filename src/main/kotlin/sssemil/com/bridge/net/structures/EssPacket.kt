@@ -38,7 +38,7 @@ data class EssPacket(val type: Byte, val payload: IEssPacketPayload) {
                     TYPE_TUN_PACKET -> {
                         val length = data.takeUInt() - 4u
                         val flags = data.takeShort()
-                        val proto = data.takeShort()
+                        val proto = data.takeShort().toUShort()
 
                         Logger.d("TUN_PACKET: [length: $length, flags: $flags, proto: $proto](${data.remainingBits() / 8})")
 

@@ -38,66 +38,6 @@ data class TCP(
     override var payload: IPacket? = null
 ) : BasePacket() {
 
-    //Checksum calculation based on the JSocket Wrench code
-    // https://github.com/ehrmann/jswrench
-    //The original code can be found at
-    //https://github.com/ehrmann/jswrench/blob/master/src/com/act365/net/SocketUtils.java
-    private fun integralFromBytes(buffer: ByteArray, offset: Int, length: Int): Long {
-        var offset = offset
-        var length = length
-
-        var answer: Long = 0
-
-        while (--length >= 0) {
-            answer = answer shl 8
-            answer = answer or (
-                    if (buffer[offset] >= 0) buffer[offset].toInt()
-                    else (-0x100) xor buffer[offset].toInt()
-                    ).toLong()
-            ++offset
-        }
-
-        return answer
-    }
-
-    //Checksum calculation based on the JSocket Wrench code
-    // https://github.com/ehrmann/jswrench
-    //The original code can be found at
-    //https://github.com/ehrmann/jswrench/blob/master/src/com/act365/net/SocketUtils.java
-    private fun checksum(message: ByteArray, length: Int, offset: Int): Short {
-        var offset = offset
-        // Sum consecutive 16-bit words.
-
-        var sum = 0
-
-        while (offset < length - 1) {
-
-            sum += integralFromBytes(message, offset, 2).toInt()
-
-            offset += 2
-        }
-
-        if (offset == length - 1) {
-
-            sum += (if (message[offset] >= 0)
-                message[offset].toInt()
-            else
-                message[offset].toInt() xor -0x100) shl 8
-        }
-
-        // Add upper 16 bits to lower 16 bits.
-
-        sum = sum.ushr(16) + (sum and 0xffff)
-
-        // Add carry
-
-        sum += sum.ushr(16)
-
-        // Ones complement and truncate.
-
-        return sum.inv().toShort()
-    }
-
     override fun resetChecksum() {
         this.checksum = 0
         super.resetChecksum()

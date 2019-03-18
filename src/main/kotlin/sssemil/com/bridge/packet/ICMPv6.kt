@@ -18,6 +18,10 @@
  */
 package sssemil.com.bridge.packet
 
+import sssemil.com.bridge.packet.icmpv6.EchoReplyMessage
+import sssemil.com.bridge.packet.icmpv6.EchoRequestMessage
+import sssemil.com.bridge.packet.types.IpProtocol
+import sssemil.com.bridge.util.InternetChecksum
 import java.nio.ByteBuffer
 
 /**
@@ -29,6 +33,11 @@ data class ICMPv6(
     var checksum: Short = 0,
     override var payload: IPacket? = null
 ) : BasePacket() {
+
+    override fun resetChecksum() {
+        this.checksum = 0
+        super.resetChecksum()
+    }
 
     /**
      * Serializes the packet. Will compute and set the following fields if they
@@ -51,27 +60,30 @@ data class ICMPv6(
 
         bb.put(this.icmpType.toByte())
         bb.put(this.icmpCode.toByte())
-        bb.putShort(this.checksum)
-
-        if (payloadData != null)
-            bb.put(payloadData)
 
         // compute checksum if needed
         if (this.checksum.toInt() == 0) {
-            bb.rewind()
-            var accumulation = 0
-
-            for (i in 0 until length / 2) {
-                accumulation += 0xffff and bb.short.toInt()
+            val pseudoHeaderData = ByteArray(length + 40)
+            val pbb = ByteBuffer.wrap(pseudoHeaderData)
+            val ipv6parent = parent as? IPv6
+            ipv6parent?.let {
+                pbb.put(it.sourceAddress.address)
+                pbb.put(it.destinationAddress.address)
+                pbb.putInt(length.toLong().toUInt().toInt())
+                pbb.put(byteArrayOf(0, 0, 0))
+                pbb.put(IpProtocol.IPv6_ICMP.ipProtocolNumber.toByte())
+                pbb.put(this.icmpType.toByte())
+                pbb.put(this.icmpCode.toByte())
+                pbb.putShort(this.checksum)
+                if (payloadData != null) {
+                    pbb.put(payloadData)
+                }
+                this.checksum = InternetChecksum.calculateChecksum(pseudoHeaderData).toShort()
             }
-            // pad to an even number of shorts
-            if (length % 2 > 0) {
-                accumulation += bb.get().toInt() and 0xff shl 8
-            }
-
-            accumulation = (accumulation shr 16 and 0xffff) + (accumulation and 0xffff)
-            this.checksum = (accumulation.inv() and 0xffff).toShort()
-            bb.putShort(2, this.checksum)
+        }
+        bb.putShort(this.checksum)
+        if (payloadData != null) {
+            bb.put(payloadData)
         }
         return data
     }
@@ -79,13 +91,14 @@ data class ICMPv6(
     @Throws(PacketParsingException::class)
     override fun deserialize(data: ByteArray, offset: Int, length: Int): IPacket {
         val bb = ByteBuffer.wrap(data, offset, length)
-        this.icmpType = bb.get().toUByte()
-        this.icmpCode = bb.get().toUByte()
-        this.checksum = bb.short
-
-        bb.position(bb.position())
-
-        this.payload = Data().deserialize(data, bb.position(), bb.limit() - bb.position()).also { parent = this }
+        icmpType = bb.get().toUByte()
+        icmpCode = bb.get().toUByte()
+        checksum = bb.short
+        payload = when (MessageType.from(icmpType)) {
+            MessageType.ECHO_REQUEST -> EchoRequestMessage()
+            MessageType.ECHO_REPLY -> EchoReplyMessage()
+            else -> Data()
+        }.deserialize(data, bb.position(), bb.limit() - bb.position()).also { parent = this }
         return this
     }
 

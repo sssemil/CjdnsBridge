@@ -18,6 +18,7 @@ package sssemil.com.bridge
 
 import kotlinx.coroutines.*
 import sssemil.com.bridge.cjdns.CjdnsProtocol
+import sssemil.com.bridge.net.stack.Icmpv6EchoServer
 import sssemil.com.bridge.net.stack.Layer
 import sssemil.com.bridge.net.stack.LoggerProtocol
 import sssemil.com.bridge.util.Logger
@@ -52,6 +53,7 @@ suspend fun exec(socket: File) {
         }
         val networkLayer = Layer().also {
             it.registerProtocol(LoggerProtocol(scope, "NET"))
+            it.registerProtocol(Icmpv6EchoServer(scope))
         }
 
         layers.add(linkLayer)
