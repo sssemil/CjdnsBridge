@@ -16,15 +16,13 @@
 
 package sssemil.com.bridge.net.structures
 
-import net.floodlightcontroller.packet.IPacket
 import net.floodlightcontroller.packet.IPv6
-import sssemil.com.bridge.ess.EssClient
 import sssemil.com.bridge.util.Logger
 import java.net.Inet6Address
 import java.net.UnknownHostException
 import java.nio.BufferUnderflowException
 
-data class EssPacket(val flags: Short, val proto: Short, val frame: IPacket) {
+data class EssPacket(val type: Byte, val payload: IEssPacketPayload) {
 
     companion object {
 
@@ -34,7 +32,7 @@ data class EssPacket(val flags: Short, val proto: Short, val frame: IPacket) {
 
         private const val IPV6_ADDR_LENGTH = 16
 
-        fun parse(client: EssClient, data: DataBitStream): EssPacket? {
+        fun parse(data: DataBitStream): EssPacket? {
             data.takeByte().let { type ->
                 when (type) {
                     TYPE_TUN_PACKET -> {
@@ -45,7 +43,10 @@ data class EssPacket(val flags: Short, val proto: Short, val frame: IPacket) {
                         Logger.d("TUN_PACKET: [length: $length, flags: $flags, proto: $proto](${data.remainingBits() / 8})")
 
                         val frameData = data.takeByteArray(Math.min(data.remainingBits() / 8, length.toLong().toInt()))
-                        return EssPacket(flags, proto, IPv6().deserialize(frameData, 0, frameData.size))
+                        return EssPacket(
+                            TYPE_TUN_PACKET,
+                            TunPacket(flags, proto, IPv6().deserialize(frameData, 0, frameData.size))
+                        )
                     }
                     TYPE_CONF_ADD_IPV6_ADDRESS -> {
                         try {
@@ -53,7 +54,7 @@ data class EssPacket(val flags: Short, val proto: Short, val frame: IPacket) {
                                 data.takeByteArray(IPV6_ADDR_LENGTH)
                             ) as Inet6Address
                             Logger.d("CONF_ADD_IPV6_ADDRESS: ${inet6Address.hostAddress}")
-                            client.addresses.add(inet6Address)
+                            return EssPacket(TYPE_CONF_ADD_IPV6_ADDRESS, EssAddIpv6AddressPayload(inet6Address))
                         } catch (e: UnknownHostException) {
                             Logger.e("Couldn't parse IPv6 address!", e)
                         } catch (e: InsufficientBitsException) {
@@ -64,7 +65,7 @@ data class EssPacket(val flags: Short, val proto: Short, val frame: IPacket) {
                         try {
                             val mtu = data.takeUInt()
                             Logger.d("CONF_SET_MTU: $mtu")
-                            client.mtu = mtu
+                            return EssPacket(TYPE_CONF_SET_MTU, EssSetMtuPayload(mtu))
                         } catch (e: BufferUnderflowException) {
                             Logger.e("Too short for a valid MTU!", e)
                         }

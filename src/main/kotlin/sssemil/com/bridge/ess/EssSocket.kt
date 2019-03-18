@@ -17,8 +17,7 @@
 package sssemil.com.bridge.ess
 
 import kotlinx.coroutines.*
-import sssemil.com.bridge.net.structures.DataBitStream
-import sssemil.com.bridge.net.structures.EssPacket
+import sssemil.com.bridge.net.structures.*
 import sssemil.com.bridge.util.Logger
 import sssemil.com.socket.SocketHelper
 import java.util.concurrent.atomic.AtomicBoolean
@@ -65,8 +64,21 @@ class EssSocket(
             val data = DataBitStream(buffer, 0, readCount)
 
             while (!data.isEmpty()) {
-                EssPacket.parse(client, data)?.let {
-                    callback.onPacket(it)
+                EssPacket.parse(data)?.let {
+                    when (it.type) {
+                        EssPacket.TYPE_TUN_PACKET -> {
+                            callback.onPacket(it.payload as TunPacket)
+                        }
+                        EssPacket.TYPE_CONF_ADD_IPV6_ADDRESS -> {
+                            client.addresses.add((it.payload as EssAddIpv6AddressPayload).inet6Address)
+                        }
+                        EssPacket.TYPE_CONF_SET_MTU -> {
+                            client.mtu = ((it.payload as EssSetMtuPayload).mtu)
+                        }
+                        else -> {
+                            /* welp */
+                        }
+                    }
                 }
             }
 
@@ -90,7 +102,7 @@ class EssSocket(
 
     interface Callback {
 
-        fun onPacket(packet: EssPacket)
+        fun onPacket(packet: TunPacket)
     }
 
     companion object {

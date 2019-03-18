@@ -21,7 +21,7 @@ import net.floodlightcontroller.packet.IPacket
 import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.ess.EssSocket
 import sssemil.com.bridge.net.stack.Protocol
-import sssemil.com.bridge.net.structures.EssPacket
+import sssemil.com.bridge.net.structures.TunPacket
 
 /**
  * This layer spits IPv6 packets from cjdns.
@@ -35,7 +35,7 @@ class CjdnsProtocol(
 
     private val callback: EssSocket.Callback = object : EssSocket.Callback {
 
-        override fun onPacket(packet: EssPacket) {
+        override fun onPacket(packet: TunPacket) {
             //TODO: Use proper handle.
             spitUp(EssClientHandle(), packet.frame)
         }
