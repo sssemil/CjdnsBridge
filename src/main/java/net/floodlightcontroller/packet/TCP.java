@@ -17,11 +17,11 @@
 
 package net.floodlightcontroller.packet;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import org.projectfloodlight.openflow.types.IpProtocol;
 import org.projectfloodlight.openflow.types.TransportPort;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  *
@@ -380,9 +380,9 @@ public class TCP extends BasePacket {
     @Override
     public IPacket deserialize(byte[] data, int offset, int length)
             throws PacketParsingException {
-        ByteBuffer bb = ByteBuffer.wrap(data, offset, length);        
-        this.sourcePort = TransportPort.of((int) (bb.getShort() & 0xffff)); // short will be signed, pos or neg
-        this.destinationPort = TransportPort.of((int) (bb.getShort() & 0xffff)); // convert range 0 to 65534, not -32768 to 32767
+        ByteBuffer bb = ByteBuffer.wrap(data, offset, length);
+        this.sourcePort = TransportPort.of((bb.getShort() & 0xffff)); // short will be signed, pos or neg
+        this.destinationPort = TransportPort.of((bb.getShort() & 0xffff)); // convert range 0 to 65534, not -32768 to 32767
         this.sequence = bb.getInt();
         this.acknowledge = bb.getInt();
         this.flags = bb.getShort();
@@ -413,5 +413,22 @@ public class TCP extends BasePacket {
         
         this.payload.setParent(this);
         return this;
-    }   
+    }
+
+    @Override
+    public String toString() {
+        return "TCP{" +
+                "sourcePort=" + sourcePort +
+                ", destinationPort=" + destinationPort +
+                ", sequence=" + sequence +
+                ", acknowledge=" + acknowledge +
+                ", dataOffset=" + dataOffset +
+                ", flags=" + flags +
+                ", windowSize=" + windowSize +
+                ", checksum=" + checksum +
+                ", urgentPointer=" + urgentPointer +
+                ", options=" + Arrays.toString(options) +
+                ", payload=" + payload +
+                '}';
+    }
 }
