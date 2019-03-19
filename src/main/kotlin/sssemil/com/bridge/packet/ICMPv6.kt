@@ -22,6 +22,7 @@ import sssemil.com.bridge.packet.icmpv6.EchoReplyMessage
 import sssemil.com.bridge.packet.icmpv6.EchoRequestMessage
 import sssemil.com.bridge.packet.types.IpProtocol
 import sssemil.com.bridge.util.InternetChecksum
+import sssemil.com.bridge.util.Logger
 import java.nio.ByteBuffer
 
 /**
@@ -47,13 +48,12 @@ data class ICMPv6(
      */
     override fun serialize(): ByteArray {
         var length = 4
-        var payloadData: ByteArray? = null
-        payload?.let {
+        val payloadData = payload?.let {
             it.parent = this
             val data = it.serialize()
             length += data.size
-            payloadData = data
-        }
+            data
+        } ?: byteArrayOf()
 
         val data = ByteArray(length)
         val bb = ByteBuffer.wrap(data)
@@ -63,28 +63,20 @@ data class ICMPv6(
 
         // compute checksum if needed
         if (this.checksum.toInt() == 0) {
-            val pseudoHeaderData = ByteArray(length + 40)
-            val pbb = ByteBuffer.wrap(pseudoHeaderData)
-            val ipv6parent = parent as? IPv6
-            ipv6parent?.let {
-                pbb.put(it.sourceAddress.address)
-                pbb.put(it.destinationAddress.address)
-                pbb.putInt(length.toLong().toUInt().toInt())
-                pbb.put(byteArrayOf(0, 0, 0))
-                pbb.put(IpProtocol.IPv6_ICMP.ipProtocolNumber.toByte())
-                pbb.put(this.icmpType.toByte())
-                pbb.put(this.icmpCode.toByte())
-                pbb.putShort(this.checksum)
-                if (payloadData != null) {
-                    pbb.put(payloadData)
-                }
-                this.checksum = InternetChecksum.calculateChecksum(pseudoHeaderData).toShort()
+            if (parent is IPv6) {
+                this.checksum = InternetChecksum.checksumHelper(
+                    data.sliceArray(0 until bb.position()),
+                    payloadData,
+                    parent as IPv6,
+                    IpProtocol.IPv6_ICMP
+                )
+            } else {
+                Logger.w("Skipping checksum calculation, no IPv6 parent...")
             }
         }
+
         bb.putShort(this.checksum)
-        if (payloadData != null) {
-            bb.put(payloadData)
-        }
+        bb.put(payloadData)
         return data
     }
 

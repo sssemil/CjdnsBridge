@@ -16,7 +16,31 @@
 
 package sssemil.com.bridge.util
 
+import sssemil.com.bridge.packet.IPv6
+import sssemil.com.bridge.packet.types.IpProtocol
+import java.nio.ByteBuffer
+
 object InternetChecksum {
+
+    fun checksumHelper(
+        payloadPreChecksum: ByteArray,
+        payloadPostChecksum: ByteArray,
+        parent: IPv6,
+        protocol: IpProtocol
+    ): Short {
+        val totalPacketLength = payloadPreChecksum.size + 2 + payloadPostChecksum.size
+        val pseudoHeaderData = ByteArray(totalPacketLength + 40)
+        val pbb = ByteBuffer.wrap(pseudoHeaderData)
+        pbb.put(parent.sourceAddress.address)
+        pbb.put(parent.destinationAddress.address)
+        pbb.putInt(totalPacketLength.toLong().toUInt().toInt())
+        pbb.put(byteArrayOf(0, 0, 0))
+        pbb.put(protocol.ipProtocolNumber.toByte())
+        pbb.put(payloadPreChecksum)
+        pbb.putShort(0)
+        pbb.put(payloadPostChecksum)
+        return InternetChecksum.calculateChecksum(pseudoHeaderData).toShort()
+    }
 
     /**
      * Calculate the Internet Checksum of a buffer (RFC 1071 - http://www.faqs.org/rfcs/rfc1071.html)

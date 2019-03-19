@@ -44,13 +44,12 @@ data class UDP(
      * -length : 0
      */
     override fun serialize(): ByteArray {
-        var payloadData: ByteArray? = null
-        payload?.let { payload ->
+        val payloadData = payload?.let { payload ->
             payload.parent = this
-            payloadData = payload.serialize()
-        }
+            payload.serialize()
+        } ?: byteArrayOf()
 
-        this.length = (8 + (payloadData?.size ?: 0)).toShort()
+        this.length = (8 + payloadData.size).toShort()
 
         val data = ByteArray(this.length.toInt())
         val bb = ByteBuffer.wrap(data)
@@ -59,8 +58,7 @@ data class UDP(
         bb.putShort(this.destinationPort.toShort())
         bb.putShort(this.length)
         bb.putShort(this.checksum)
-        if (payloadData != null)
-            bb.put(payloadData)
+        bb.put(payloadData)
 
         // compute checksum if needed
         if (this.checksum.toInt() == 0) {

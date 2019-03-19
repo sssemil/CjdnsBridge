@@ -53,15 +53,12 @@ data class TCP(
         if (dataOffset.toInt() == 0)
             dataOffset = 5  // default header length
         var length = dataOffset.toInt() shl 2
-        var payloadData: ByteArray? = null
-        payload?.let { payload ->
+        val payloadData = payload?.let { payload ->
             payload.parent = this
-
-            payload.serialize().let { data ->
-                payloadData = data
-                length += data.size
-            }
-        }
+            val data = payload.serialize()
+            length += data.size
+            data
+        } ?: byteArrayOf()
 
         val data = ByteArray(length)
         val bb = ByteBuffer.wrap(data)
@@ -80,8 +77,7 @@ data class TCP(
             for (i in 0 until padding)
                 bb.put(0.toByte())
         }
-        if (payloadData != null)
-            bb.put(payloadData)
+        bb.put(payloadData)
 
         // compute checksum if needed
         if (this.checksum.toInt() == 0) {
