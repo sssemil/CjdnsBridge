@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Main" type="JetRunConfigurationType" factoryName="Kotlin" singleton="true">
-    <module name="CjdnsBridge_main" />
+  <configuration default="false" name="Main" type="JetRunConfigurationType" factoryName="Kotlin">
+    <module name="cjdns_bridge.main" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="/tmp/essnet" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />

@@ -19,10 +19,11 @@ package sssemil.com.bridge.cjdns
 import kotlinx.coroutines.CoroutineScope
 import sssemil.com.bridge.ess.EssClientHandle
 import sssemil.com.bridge.ess.EssSocket
-import sssemil.com.bridge.net.stack.Protocol
-import sssemil.com.bridge.net.structures.TunPacket
-import sssemil.com.bridge.packet.IPacket
-import sssemil.com.bridge.util.Logger
+import sssemil.com.common.util.Logger
+import sssemil.com.net.interfaces.IClientHandle
+import sssemil.com.net.packet.IPacket
+import sssemil.com.net.stack.Protocol
+import sssemil.com.net.structures.TunPacket
 
 /**
  * This layer spits IPv6 packets from cjdns.
@@ -43,7 +44,10 @@ class CjdnsProtocol(
 
     private val cjdnsSocket = EssSocket(scope, path, callback)
 
-    override fun swallowFromAbove(handle: EssClientHandle, packet: IPacket) {
+    override fun swallowFromAbove(
+        handle: IClientHandle,
+        packet: IPacket
+    ) {
         Logger.d("CJDNS: from above: $packet")
         val tunPacket = TunPacket(frame = packet)
         val buffer = tunPacket.serialize()

@@ -100,7 +100,6 @@ class UnixDomainServerSocket
         } catch (e: LastErrorException) {
             throw IOException(e)
         }
-
     }
 
     @Throws(IOException::class)

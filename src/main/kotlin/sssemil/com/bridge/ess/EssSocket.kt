@@ -17,8 +17,8 @@
 package sssemil.com.bridge.ess
 
 import kotlinx.coroutines.*
-import sssemil.com.bridge.net.structures.*
-import sssemil.com.bridge.util.Logger
+import sssemil.com.common.util.Logger
+import sssemil.com.net.structures.*
 import sssemil.com.socket.SocketHelper
 import java.util.concurrent.atomic.AtomicBoolean
 

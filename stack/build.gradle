@@ -1,0 +1,24 @@
+plugins {
+    // Apply the Kotlin JVM plugin to add support for Kotlin on the JVM.
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
+
+    testRuntime("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
+    testCompile("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
+    testRuntime("org.junit.vintage:junit-vintage-engine:$junitVersion")
+    
+    implementation project(path: ':common')
+}
+
+kotlin.sourceSets.all {
+    languageSettings.useExperimentalAnnotation("kotlin.ExperimentalUnsignedTypes")
+}

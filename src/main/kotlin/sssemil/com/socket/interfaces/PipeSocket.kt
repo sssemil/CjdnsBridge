@@ -16,7 +16,7 @@
 
 package sssemil.com.socket.interfaces
 
-import sssemil.com.bridge.util.Logger
+import sssemil.com.common.util.Logger
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream

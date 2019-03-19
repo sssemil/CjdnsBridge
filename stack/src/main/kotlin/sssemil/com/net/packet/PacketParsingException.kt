@@ -1,5 +1,6 @@
 /*
  * Copyright 2019 Emil Suleymanov
+ * Copyright 2013, Big Switch Networks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +15,6 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.ess
+package sssemil.com.net.packet
 
-import sssemil.com.net.interfaces.IClientHandle
-import kotlin.random.Random
-import kotlin.random.nextUInt
-
-data class EssClientHandle(val handle: UInt = Random.nextUInt()) : IClientHandle
+class PacketParsingException(msg: String) : Exception(msg)

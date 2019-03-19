@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.ess
+package sssemil.com.net.stack
 
+import kotlinx.coroutines.CoroutineScope
+import sssemil.com.common.util.Logger
 import sssemil.com.net.interfaces.IClientHandle
-import kotlin.random.Random
-import kotlin.random.nextUInt
+import sssemil.com.net.packet.IPacket
 
-data class EssClientHandle(val handle: UInt = Random.nextUInt()) : IClientHandle
+class LoggerProtocol(scope: CoroutineScope, val tag: String? = null) : Protocol(scope) {
+
+    override fun swallowFromAbove(
+        handle: IClientHandle,
+        packet: IPacket
+    ) {
+        Logger.d("${tag ?: "LOG"} from above: $packet")
+    }
+
+    override fun swallowFromBelow(
+        handle: IClientHandle,
+        packet: IPacket
+    ) {
+        Logger.d("${tag ?: "LOG"} from below: $packet")
+    }
+}

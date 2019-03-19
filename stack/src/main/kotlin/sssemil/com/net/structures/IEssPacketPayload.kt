@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.ess
+package sssemil.com.net.structures
 
-import sssemil.com.net.interfaces.IClientHandle
-import kotlin.random.Random
-import kotlin.random.nextUInt
-
-data class EssClientHandle(val handle: UInt = Random.nextUInt()) : IClientHandle
+interface IEssPacketPayload

@@ -1,2 +1,2 @@
-rootProject.name = 'CjdnsBridge'
-
+rootProject.name = 'cjdns_bridge'
+include 'common', 'stack'

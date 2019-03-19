@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package sssemil.com.bridge.ess
+package sssemil.com.net.structures
 
-import sssemil.com.net.interfaces.IClientHandle
-import kotlin.random.Random
-import kotlin.random.nextUInt
+import java.net.Inet6Address
 
-data class EssClientHandle(val handle: UInt = Random.nextUInt()) : IClientHandle
+class EssAddIpv6AddressPayload(val inet6Address: Inet6Address) : IEssPacketPayload

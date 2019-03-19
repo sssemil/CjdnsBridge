@@ -18,10 +18,10 @@ package sssemil.com.bridge
 
 import kotlinx.coroutines.*
 import sssemil.com.bridge.cjdns.CjdnsProtocol
-import sssemil.com.bridge.net.stack.Icmpv6EchoServer
-import sssemil.com.bridge.net.stack.Layer
-import sssemil.com.bridge.net.stack.LoggerProtocol
-import sssemil.com.bridge.util.Logger
+import sssemil.com.common.util.Logger
+import sssemil.com.net.stack.Icmpv6EchoServer
+import sssemil.com.net.stack.Layer
+import sssemil.com.net.stack.LoggerProtocol
 import java.io.File
 import java.lang.System.exit
 
