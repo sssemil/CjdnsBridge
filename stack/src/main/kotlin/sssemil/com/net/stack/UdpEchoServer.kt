@@ -22,6 +22,11 @@ import sssemil.com.net.packet.IPacket
 import sssemil.com.net.packet.IPv6
 import sssemil.com.net.packet.UDP
 
+/**
+ * This is a UDP echo server, anything that comes in will be sent back. This class has been
+ * written to test UDP checksum. You could use the following command to play with it:
+ * nc -u -6 fc00:1234:1234:1234:1234:1234:1234:1234 12345
+ */
 class UdpEchoServer(scope: CoroutineScope, val port: UShort = 12345u) : Protocol(scope) {
 
     override fun swallowFromBelow(
