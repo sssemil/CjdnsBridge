@@ -22,6 +22,7 @@ import sssemil.com.common.util.Logger
 import sssemil.com.net.stack.Icmpv6EchoServer
 import sssemil.com.net.stack.Layer
 import sssemil.com.net.stack.LoggerProtocol
+import sssemil.com.net.stack.UdpEchoServer
 import java.io.File
 import java.lang.System.exit
 
@@ -54,6 +55,7 @@ suspend fun exec(socket: File) {
         val networkLayer = Layer().also {
             it.registerProtocol(LoggerProtocol(scope, "NET"))
             it.registerProtocol(Icmpv6EchoServer(scope))
+            it.registerProtocol(UdpEchoServer(scope))
         }
 
         layers.add(linkLayer)
