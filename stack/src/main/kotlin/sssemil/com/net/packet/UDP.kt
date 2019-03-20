@@ -16,6 +16,9 @@
 
 package sssemil.com.net.packet
 
+import sssemil.com.common.util.Logger
+import sssemil.com.net.packet.types.IpProtocol
+import sssemil.com.net.util.InternetChecksum
 import java.nio.ByteBuffer
 
 /**
@@ -24,7 +27,7 @@ import java.nio.ByteBuffer
 data class UDP(
     var sourcePort: UShort = 0u,
     var destinationPort: UShort = 0u,
-    var length: Short = 0,
+    var length: UShort = 0u,
     var checksum: Short = 0,
     override var payload: IPacket? = null
 ) : BasePacket() {
@@ -46,34 +49,31 @@ data class UDP(
             payload.serialize()
         } ?: byteArrayOf()
 
-        this.length = (8 + payloadData.size).toShort()
+        this.length = (8 + payloadData.size).toUShort()
 
         val data = ByteArray(this.length.toInt())
         val bb = ByteBuffer.wrap(data)
 
         bb.putShort(this.sourcePort.toShort()) // UDP packet port numbers are 16 bit
         bb.putShort(this.destinationPort.toShort())
-        bb.putShort(this.length)
-        bb.putShort(this.checksum)
-        bb.put(payloadData)
+        bb.putShort(this.length.toShort())
 
         // compute checksum if needed
         if (this.checksum.toInt() == 0) {
-            bb.rewind()
-            var accumulation = 0
-
-            for (i in 0 until this.length / 2) {
-                accumulation += 0xffff and bb.short.toInt()
+            if (parent is IPv6) {
+                this.checksum = InternetChecksum.checksumHelper(
+                    data.sliceArray(0 until bb.position()),
+                    payloadData,
+                    parent as IPv6,
+                    IpProtocol.UDP
+                )
+            } else {
+                Logger.w("Skipping checksum calculation, no IPv6 parent...")
             }
-            // pad to an even number of shorts
-            if (this.length % 2 > 0) {
-                accumulation += bb.get().toInt() and 0xff shl 8
-            }
-
-            accumulation = (accumulation shr 16 and 0xffff) + (accumulation and 0xffff)
-            this.checksum = (accumulation.inv() and 0xffff).toShort()
-            bb.putShort(6, this.checksum)
         }
+
+        bb.putShort(this.checksum)
+        bb.put(payloadData)
         return data
     }
 
@@ -83,7 +83,7 @@ data class UDP(
         this.sourcePort = ((bb.short.toInt() and 0xffff)).toUShort() // short will be signed, pos or neg
         this.destinationPort =
                 ((bb.short.toInt() and 0xffff)).toUShort() // convert range 0 to 65534, not -32768 to 32767
-        this.length = bb.short
+        this.length = bb.short.toUShort()
         this.checksum = bb.short
 
         when {
