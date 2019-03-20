@@ -1,2 +1,3 @@
 rootProject.name = 'cjdns_bridge'
-include 'common', 'stack'
+include 'common', 'stack', 'sockslib'
+

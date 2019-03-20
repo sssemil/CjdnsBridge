@@ -34,6 +34,7 @@ dependencies {
 
     implementation project(path: ":common")
     implementation project(path: ":stack")
+    implementation project(path: ":sockslib")
 }
 
 allprojects {

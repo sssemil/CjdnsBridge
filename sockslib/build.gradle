@@ -1,0 +1,39 @@
+buildscript {
+    ext.guavaVersion = "19.0"
+    ext.slf4jApiVersion = "1.7.12"
+    ext.log4jVersion = "2.4"
+    ext.jsr305Version = "3.0.0"
+    ext.junitVersion = "4.9"
+    ext.mongoVerson = "3.0.3"
+    ext.tomcatDbcpVersion = "6.0.44"
+    ext.h2Version = "1.4.188"
+}
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+group 'io.github.fengyouchao'
+version '1.0.0-SNAPSHOT'
+description = "A Java library for SOCKS5 client and SOCKS5 server"
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "org.slf4j:slf4j-api:${slf4jApiVersion}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    implementation "com.google.guava:guava:${guavaVersion}"
+    implementation "com.google.code.findbugs:jsr305:${jsr305Version}"
+    implementation "org.mongodb:mongo-java-driver:${mongoVerson}"
+    testImplementation "org.apache.tomcat:dbcp:${tomcatDbcpVersion}"
+    testImplementation "com.h2database:h2:${h2Version}"
+    testImplementation "junit:junit:${junitVersion}"
+    implementation project(path: ":stack")
+}

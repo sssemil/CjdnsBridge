@@ -17,6 +17,7 @@
 package sssemil.com.bridge
 
 import kotlinx.coroutines.*
+import sockslib.server.SocksServerBuilder
 import sssemil.com.bridge.cjdns.CjdnsProtocol
 import sssemil.com.common.util.Logger
 import sssemil.com.net.stack.Icmpv6EchoServer
@@ -29,6 +30,8 @@ import java.lang.System.exit
 val job = SupervisorJob()
 val scope = CoroutineScope(Dispatchers.Default + job)
 
+val proxyServer = SocksServerBuilder.buildAnonymousSocks5Server()
+
 fun main(args: Array<String>) = runBlocking {
     if (args.size != 1) {
         printUsageAndExit()
@@ -39,6 +42,10 @@ fun main(args: Array<String>) = runBlocking {
         if (socketFile.exists()) {
             Logger.w("Specified path is already taken!")
             socketFile.delete()
+        }
+
+        withContext(Dispatchers.IO) {
+            proxyServer.start()
         }
 
         Logger.i("Socket path: ${socketFile.absolutePath}")
