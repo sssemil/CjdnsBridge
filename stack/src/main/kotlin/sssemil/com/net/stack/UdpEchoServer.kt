@@ -22,28 +22,30 @@ import sssemil.com.net.packet.IPacket
 import sssemil.com.net.packet.IPv6
 import sssemil.com.net.packet.UDP
 
-class UdpEchoServer(scope: CoroutineScope) : Protocol(scope) {
+class UdpEchoServer(scope: CoroutineScope, val port: UShort = 12345u) : Protocol(scope) {
 
     override fun swallowFromBelow(
         handle: IClientHandle,
         packet: IPacket
     ) {
         (((packet as? IPv6)?.payload as? UDP))?.let {
-            val tmpAddress = packet.destinationAddress
-            packet.destinationAddress = packet.sourceAddress
-            packet.sourceAddress = tmpAddress
+            if (it.destinationPort == port) {
+                val tmpAddress = packet.destinationAddress
+                packet.destinationAddress = packet.sourceAddress
+                packet.sourceAddress = tmpAddress
 
-            val reply = it
+                val reply = it
 
-            val tmpPort = reply.destinationPort
-            reply.destinationPort = reply.sourcePort
-            reply.sourcePort = tmpPort
+                val tmpPort = reply.destinationPort
+                reply.destinationPort = reply.sourcePort
+                reply.sourcePort = tmpPort
 
-            reply.resetChecksum()
+                reply.resetChecksum()
 
-            packet.payload = reply
-            packet.resetChecksum()
-            spitDown(handle, packet)
+                packet.payload = reply
+                packet.resetChecksum()
+                spitDown(handle, packet)
+            }
         }
     }
 }
